@@ -9,7 +9,7 @@ const Footer = () => {
                 <Container>
                     <Row>
                         <Col md={6}>
-                            <p>&copy; {currentYear} Michael Njogu. Made with <a href="https://www.contentful.com/" rel="nofollow noreferrer" target="_blank">Contentful</a> &amp; <a href="https://reactjs.org/" rel="nofollow noreferrer" target="_blank">React</a>.</p>
+                            <p>&copy; {currentYear} Michael Njogu. Made with <a href="https://www.contentful.com/" rel="nofollow noreferrer" target="_blank">Contentful</a> &amp; <a href="https://vite.dev/guide/" rel="nofollow noreferrer" target="_blank">React + Vite</a>.</p>
                         </Col>
                         <Col md={6}>
                             <ul className="social-icons">
