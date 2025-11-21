@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Block admin or preview routes (if you have any)
+Disallow: /preview/
