@@ -17,7 +17,7 @@ const fadeInUp = {
     opacity: 1,
     y: 0,
     filter: 'blur(0px)',
-    transition: { duration: 0.8, ease: [0.4, 0, 0.2, 1] },
+    transition: { duration: 0.8, ease: [0.4, 0, 0.2, 1] as any },
   },
 };
 
@@ -262,7 +262,7 @@ const About = () => {
                     {isInternalPath(heroLink1Url) ? (
                       <Button
                         variant="primary"
-                        as={Link}
+                        as={Link as any}
                         to={heroLink1Url}
                         className="d-inline-flex align-items-center ms-0"
                       >
