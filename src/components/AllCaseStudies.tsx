@@ -4,6 +4,7 @@ import { Container } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Hero from './ui/Hero';
+import LoadingSpinner from './ui/LoadingSpinner';
 import { selectClient } from '../contentfulClient';
 import { ContentfulLivePreview } from '@contentful/live-preview';
 import { Stars } from 'react-bootstrap-icons';
@@ -179,7 +180,13 @@ const CaseStudies: React.FC = () => {
             A selection of projects showcasing my approach to strategic product design, user experience, and problem-solving across various contexts.
           </p>
 
-          {loading && <p>Loading projects...</p>}
+          {loading && <LoadingSpinner messages={[
+            "Loading case studies...",
+            "Gathering insights and stories...",
+            "Warming up the project gallery...",
+            "Preparing the design showcase...",
+            "Fetching design adventures..."  
+          ]} />}
           {!loading && error && <p className="text-danger">Error: {error}</p>}
           {!loading && !error && caseStudies.length === 0 && <p>No projects found.</p>}
 
