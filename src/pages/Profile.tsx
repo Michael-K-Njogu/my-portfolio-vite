@@ -1,8 +1,8 @@
-// src/pages/About.js
-import { useEffect, useState, useCallback } from 'react';
+// src/pages/Profile.tsx
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Row, Col, Button, Spinner } from 'react-bootstrap';
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import Avatar from '../images/michael-njogu.jpg';
 import AnimeAvatar from '../images/michael-anime.jpg';
 import Resume from '../docs/Michael_Njogu_CV.pdf';
@@ -10,8 +10,59 @@ import { BoxArrowUpRight, ArrowUpRight, Download } from 'react-bootstrap-icons';
 import Timeline from '../components/ui/Timeline';
 import { selectClient } from '../contentfulClient';
 
-// --- Animation variants (same as before) ---
-const fadeInUp = {
+/* ----------------------
+   Types
+   ---------------------- */
+type Maybe<T> = T | null | undefined;
+
+type ContentfulSys = {
+  id?: string;
+  [k: string]: any;
+};
+
+type ContentfulFileLike = {
+  url?: string;
+  [k: string]: any;
+};
+
+type ContentfulReference<T = any> = {
+  sys?: ContentfulSys;
+  fields?: T;
+};
+
+type ToolItem = {
+  id: string;
+  name: string;
+  desc?: string;
+  iconUrl?: string | null;
+  inverted?: boolean;
+};
+
+type ExperienceItem = {
+  id?: string | number | null;
+  date: string;
+  title: string;
+  description?: string;
+  type?: string;
+  importance?: string;
+  organizationLogo?: any;
+};
+
+type CertificationItem = {
+  id?: string | number | null;
+  title?: string;
+  institution?: string;
+  dateAttained?: string;
+  credentialUrl?: string;
+  inProgress?: boolean;
+  iconUrl?: string | null;
+  inverted?: boolean;
+};
+
+/* ----------------------
+   Animation Variants
+   ---------------------- */
+const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 30, filter: 'blur(8px)' },
   visible: {
     opacity: 1,
@@ -21,23 +72,24 @@ const fadeInUp = {
   },
 };
 
-const staggerContainer = {
+const staggerContainer: Variants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.15 } },
 };
 
-// fallback static data (your previous arrays) — used only if Contentful returns nothing
-const FALLBACK_LEARNING = [
+/* ----------------------
+   Fallback Data
+   ---------------------- */
+const FALLBACK_LEARNING: CertificationItem[] = [
   {
     id: 'iaap-member',
     title: 'IAAP - Professional Member',
-    source: 'International Association of Accessibility Professionals',
-    link: 'https://www.credly.com/badges/5fec40f7-8cdf-4839-87db-8d685129632f/public_url',
-    icon: './images/profile/iaap-member.png',
-    alt: 'IAAP Member badge',
-    inverted: false
+    institution: 'International Association of Accessibility Professionals',
+    credentialUrl:
+      'https://www.credly.com/badges/5fec40f7-8cdf-4839-87db-8d685129632f/public_url',
+    iconUrl: './images/profile/iaap-member.png',
+    inverted: false,
   },
-  // ... you can add other fallback items if desired
 ];
 
 const FALLBACK_SKILLS = [
@@ -51,27 +103,66 @@ const FALLBACK_SKILLS = [
   'HTML5 & CSS3',
 ];
 
-const FALLBACK_TOOLS = [
-  { id: 'figma', name: 'Figma', icon: './images/profile/figma.png', desc: 'User interface design & prototyping', inverted: false },
-  { id: 'vscode', name: 'VS Code', icon: './images/profile/vscode.png', desc: 'Code editing & development', inverted: false },
-  { id: 'react', name: 'React', icon: './images/profile/react.png', desc: 'Building user interfaces', inverted: false }
+const FALLBACK_TOOLS: ToolItem[] = [
+  {
+    id: 'figma',
+    name: 'Figma',
+    iconUrl: './images/profile/figma.png',
+    desc: 'User interface design & prototyping',
+    inverted: false,
+  },
+  {
+    id: 'vscode',
+    name: 'VS Code',
+    iconUrl: './images/profile/vscode.png',
+    desc: 'Code editing & development',
+    inverted: false,
+  },
+  {
+    id: 'react',
+    name: 'React',
+    iconUrl: './images/profile/react.png',
+    desc: 'Building user interfaces',
+    inverted: false,
+  },
 ];
 
-// Utility: ensure asset url is absolute with https
-const toAssetUrl = (maybeFile) => {
+/* ----------------------
+   Utilities
+   ---------------------- */
+
+/**
+ * Normalize a Contentful file-like object or string to an absolute URL (or null)
+ */
+const toAssetUrl = (maybeFile?: string | ContentfulFileLike | null): string | null => {
   if (!maybeFile) return null;
-  const url = typeof maybeFile === 'string'
-    ? maybeFile
-    : maybeFile.url ?? maybeFile.fields?.file?.url ?? null;
-  if (!url) return null;
+
+  let url: unknown;
+  if (typeof maybeFile === 'string') {
+    url = maybeFile;
+  } else if (typeof maybeFile === 'object') {
+    // contentful shape variations
+    url =
+      (maybeFile as any).url ??
+      (maybeFile as any).fields?.file?.url ??
+      (maybeFile as any).fields?.file?.url ??
+      null;
+  } else {
+    return null;
+  }
+
+  if (typeof url !== 'string') return null;
   if (url.startsWith('//')) return `https:${url}`;
+  // contentful sometimes returns /https:... (rare) or absolute already
   if (url.startsWith('/')) return url;
   return url;
 };
 
-// Utility: detect internal path and render Link vs anchor
-const isInternalPath = (url) => {
-  if (!url) return false;
+/**
+ * Lightweight check whether a url is internal (starts with "/" or matches origin)
+ */
+const isInternalPath = (url?: Maybe<string>): boolean => {
+  if (!url || typeof url !== 'string') return false;
   if (url.startsWith('/')) return true;
   if (typeof window === 'undefined') return false;
   try {
@@ -81,149 +172,187 @@ const isInternalPath = (url) => {
   }
 };
 
-const About = () => {
-  const [isFlipped, setIsFlipped] = useState(false);
+/* ----------------------
+   Component
+   ---------------------- */
+const About: React.FC = () => {
+  const [isFlipped, setIsFlipped] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [aboutData, setAboutData] = useState<ContentfulReference<any> | null>(null);
 
-  // Contentful data
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [aboutData, setAboutData] = useState(null);
+  // Derived values memoized to avoid recompute on every render
+  const {
+    heroTitle,
+    heroSubtitle,
+    heroLink1Label,
+    heroLink1Url,
+    heroLink2Label,
+    heroLink2Url,
+    skills,
+    tools,
+    experience,
+    hasExperience,
+    certifications,
+  } = useMemo(() => {
+    const fields = aboutData?.fields ?? ({} as any);
 
-  // derived fields with fallbacks
-  const heroTitle = aboutData?.fields?.aboutHeroTitle ?? 'About Me.';
-  const heroSubtitle = aboutData?.fields?.aboutHeroSubtitle ?? "I learn by doing, exploring possibilities, experimenting with solutions, and adapting as I discover what works.";
-  const heroLink1Label = aboutData?.fields?.aboutHeroPrimaryLinkLabel ?? 'View my work';
-  const heroLink1Url = aboutData?.fields?.aboutHeroPrimaryLinkUrl ?? '/';
-  const heroLink2Label = aboutData?.fields?.uploadResumeTitle ?? 'Download my resume';
-  const heroLink2Url = toAssetUrl(aboutData?.fields?.uploadResume) ?? Resume;
+    const heroTitle = fields.aboutHeroTitle ?? 'About Me.';
+    const heroSubtitle =
+      fields.aboutHeroSubtitle ??
+      "I learn by doing, exploring possibilities, experimenting with solutions, and adapting as I discover what works.";
+    const heroLink1Label = fields.aboutHeroPrimaryLinkLabel ?? 'View my work';
+    const heroLink1Url = fields.aboutHeroPrimaryLinkUrl ?? '/';
+    const heroLink2Label = fields.uploadResumeTitle ?? 'Download my resume';
+    const heroLink2Url = toAssetUrl(fields.uploadResume) ?? Resume;
 
-  const skills = aboutData?.fields?.coreSkills ?? FALLBACK_SKILLS;
-  // tools: expect array of reference entries { fields: { name, purpose, icon } }
-  const toolsArray = aboutData?.fields?.coreTools ?? [];
-  const tools = Array.isArray(toolsArray) && toolsArray.length > 0
-    ? toolsArray.map(t => {
-        try {
-          return {
-            id: t.sys?.id ?? t.fields?.toolName,
-            name: t.fields?.toolName,
-            desc: t.fields?.toolPurpose,
-            iconUrl: toAssetUrl(t.fields?.toolIcon),
-            inverted: !!t.fields?.toolIconInverted
-          };
-        } catch (err) {
-          console.error('Error mapping tool:', err, t);
-          return null;
-        }
-      }).filter(Boolean)
-    : FALLBACK_TOOLS;
+    // skills
+    const skillsRaw: string[] | undefined = fields.coreSkills;
+    const skills = Array.isArray(skillsRaw) && skillsRaw.length > 0 ? skillsRaw : FALLBACK_SKILLS;
 
-  // experience list - transform to Timeline format
-  const experienceArray = aboutData?.fields?.experience ?? [];
-  const experience = Array.isArray(experienceArray) && experienceArray.length > 0
-    ? experienceArray.map(e => {
-        try {
-          // Combine jobTitle and organization for the title
-          const jobTitle = e.fields?.jobTitle || '';
-          const organization = e.fields?.organization || '';
-          const title = organization 
-            ? `${jobTitle}${jobTitle ? ', ' : ''}${organization}`
-            : jobTitle || 'Untitled Position';
-          
-          return {
-            id: e.sys?.id,
-            date: e.fields?.duration || 'Date not specified',
-            title: title,
-            description: e.fields?.jobDescription || '',
-            type: 'professional',
-            importance: e.fields?.importance || 'standard',
-            // Keep original fields for potential future use
-            organizationLogo: e.fields?.organizationLogo,
-          };
-        } catch (err) {
-          console.error('Error mapping experience:', err, e);
-          return null;
-        }
-      }).filter(Boolean)
-    : [];
-  const hasExperience = experience.length > 0;
+    // tools mapping
+    const toolsRaw: any[] | undefined = fields.coreTools;
+    const tools: ToolItem[] =
+      Array.isArray(toolsRaw) && toolsRaw.length > 0
+        ? toolsRaw
+            .map((t) => {
+              try {
+                const id = t.sys?.id ?? t.fields?.toolName ?? JSON.stringify(t);
+                const name = t.fields?.toolName ?? 'Tool';
+                const desc = t.fields?.toolPurpose ?? undefined;
+                const iconUrl = toAssetUrl(t.fields?.toolIcon);
+                const inverted = !!t.fields?.toolIconInverted;
+                return { id, name, desc, iconUrl, inverted } as ToolItem;
+              } catch {
+                return null;
+              }
+            })
+            .filter(Boolean) as ToolItem[]
+        : FALLBACK_TOOLS;
 
-  // certifications
-  const certificationsArray = aboutData?.fields?.certifications ?? [];
-  const certifications = Array.isArray(certificationsArray) && certificationsArray.length > 0
-    ? certificationsArray.map(c => {
-        try {
-          return {
-            id: c.sys?.id,
-            title: c.fields?.certTitle,
-            institution: c.fields?.institution,
-            dateAttained: c.fields?.dateAttained,
-            credentialUrl: c.fields?.credentialUrl,
-            inProgress: !!c.fields?.inProgress,
-            iconUrl: toAssetUrl(c.fields?.institutionLogo),
-            inverted: !!c.fields?.institutionLogoInverted,
-          };
-        } catch (err) {
-          console.error('Error mapping certification:', err, c);
-          return null;
-        }
-      }).filter(Boolean)
-    : [];
+    // experience mapping
+    const expRaw: any[] | undefined = fields.experience;
+    const experience: ExperienceItem[] =
+      Array.isArray(expRaw) && expRaw.length > 0
+        ? expRaw
+            .map((e) => {
+              try {
+                const jobTitle = e.fields?.jobTitle ?? '';
+                const organization = e.fields?.organization ?? '';
+                const title = organization ? `${jobTitle}${jobTitle ? ', ' : ''}${organization}` : jobTitle || 'Untitled Position';
+                return {
+                  id: e.sys?.id,
+                  date: e.fields?.duration ?? 'Date not specified',
+                  title,
+                  description: e.fields?.jobDescription ?? '',
+                  type: 'professional',
+                  importance: e.fields?.importance ?? 'standard',
+                  organizationLogo: e.fields?.organizationLogo,
+                } as ExperienceItem;
+              } catch {
+                return null;
+              }
+            })
+            .filter(Boolean) as ExperienceItem[]
+        : [];
+
+    const hasExperience = experience.length > 0;
+
+    // certifications mapping
+    const certsRaw: any[] | undefined = fields.certifications;
+    const certifications: CertificationItem[] =
+      Array.isArray(certsRaw) && certsRaw.length > 0
+        ? certsRaw
+            .map((c) => {
+              try {
+                return {
+                  id: c.sys?.id,
+                  title: c.fields?.certTitle,
+                  institution: c.fields?.institution,
+                  dateAttained: c.fields?.dateAttained,
+                  credentialUrl: c.fields?.credentialUrl,
+                  inProgress: !!c.fields?.inProgress,
+                  iconUrl: toAssetUrl(c.fields?.institutionLogo),
+                  inverted: !!c.fields?.institutionLogoInverted,
+                } as CertificationItem;
+              } catch {
+                return null;
+              }
+            })
+            .filter(Boolean) as CertificationItem[]
+        : [];
+
+    return {
+      heroTitle,
+      heroSubtitle,
+      heroLink1Label,
+      heroLink1Url,
+      heroLink2Label,
+      heroLink2Url,
+      skills,
+      tools,
+      experience,
+      hasExperience,
+      certifications,
+    };
+  }, [aboutData]);
 
   useEffect(() => {
-    document.title = "Michael Njogu - Strategic Product Designer";
+    document.title = 'Michael Njogu - Strategic Product Designer';
   }, []);
 
   const handleAvatarFlip = useCallback(() => {
-    setIsFlipped(prev => !prev);
+    setIsFlipped((p) => !p);
   }, []);
 
-  // Fetch About page from Contentful
+  // Fetch contentful "aboutPage"
   useEffect(() => {
     let mounted = true;
     setLoading(true);
     setError(null);
 
-    // enable preview when URL has ?preview=true
     const previewSearch = typeof window !== 'undefined' ? window.location.search : '';
     const usePreview = previewSearch.includes('preview=true');
     const client = selectClient(usePreview);
 
-    const fetchAbout = async () => {
+    (async () => {
       try {
-        const res = await client.getEntries({
+        const res = await client.getEntries?.({
           content_type: 'aboutPage',
           include: 10,
-          limit: 1
+          limit: 1,
         });
 
         if (!mounted) return;
+
         if (res?.items?.length) {
-          const aboutEntry = res.items[0];
-          setAboutData(aboutEntry);
+          setAboutData(res.items[0]);
         } else {
-          // No aboutPage entry found — keep aboutData null (fallbacks will be used)
-          setAboutData(null);
+          setAboutData(null); // will cause fallbacks to be used
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error fetching About page from Contentful:', err);
         if (mounted) {
-          const message = err?.message
-            ? `Failed to load About page: ${err.message}`
-            : 'Failed to load About page.';
-          setError(message);
+          setError(
+            err?.message ? `Failed to load About page: ${err.message}` : 'Failed to load About page.'
+          );
         }
       } finally {
         if (mounted) setLoading(false);
       }
-    };
+    })();
 
-    fetchAbout();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   if (loading) {
     return (
-      <div className="wrapper" style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div
+        className="wrapper"
+        style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+      >
         <Spinner animation="border" role="status" />
       </div>
     );
@@ -239,96 +368,71 @@ const About = () => {
     );
   }
 
+  const hero2IsPdfPath = typeof heroLink2Url === 'string' && heroLink2Url.endsWith('.pdf');
+
   return (
     <div className="wrapper">
-
       {/* Hero Section */}
       <section className="hero bg-secondary">
         <Container>
           <Row className="align-items-center">
             <Col md={9}>
-              <motion.div
-                variants={fadeInUp}
-                initial="hidden"
-                animate="visible"
-                className="hero-text"
-              >
+              <motion.div variants={fadeInUp} initial="hidden" animate="visible" className="hero-text">
                 <h1 className="hero-title">{heroTitle}</h1>
                 <p className="mb-4">{heroSubtitle}</p>
 
                 <div className="hero-buttons d-flex flex-column flex-md-row gap-2 gap-md-3">
                   <motion.div>
-                    {/* heroLink1: internal (Link) or external (anchor) */}
                     {isInternalPath(heroLink1Url) ? (
-                      <Button
-                        variant="primary"
-                        as={Link as any}
-                        to={heroLink1Url}
-                        className="d-inline-flex align-items-center ms-0"
-                      >
+                      <Button variant="primary" as={Link as any} to={heroLink1Url} className="d-inline-flex align-items-center ms-0">
                         {heroLink1Label}
-                        <span className="bootstrap-icon ms-1"><ArrowUpRight size={24} /></span>
+                        <span className="bootstrap-icon ms-1">
+                          <ArrowUpRight size={24} />
+                        </span>
                       </Button>
                     ) : (
-                      <Button
-                        variant="primary"
-                        href={heroLink1Url}
-                        className="d-inline-flex align-items-center ms-0"
-                      >
+                      <Button variant="primary" href={heroLink1Url} className="d-inline-flex align-items-center ms-0" target="_blank" rel="noopener noreferrer">
                         {heroLink1Label}
-                        <span className="bootstrap-icon ms-1"><ArrowUpRight size={24} /></span>
+                        <span className="bootstrap-icon ms-1">
+                          <ArrowUpRight size={24} />
+                        </span>
                       </Button>
                     )}
                   </motion.div>
 
                   <motion.div>
-                    {/* heroLink2: maybe a resume asset; fallback to static Resume file */}
-                    {heroLink2Url && !heroLink2Url.includes('http') && heroLink2Url.endsWith('.pdf') ? (
-                      // If it's a URL path that ends with pdf, use anchor
-                      <Button
-                        href={heroLink2Url}
-                        variant="outline-secondary"
-                        className="d-inline-flex align-items-center ms-0"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {heroLink2Label}
-                        <span className="bootstrap-icon ms-1"><Download size={24} /></span>
-                      </Button>
-                    ) : (
-                      <Button
-                        href={heroLink2Url || Resume}
-                        variant="outline-secondary"
-                        className="d-inline-flex align-items-center ms-0"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        {heroLink2Label}
-                        <span className="bootstrap-icon ms-1"><Download size={24} /></span>
-                      </Button>
-                    )}
+                    {/* Prefer absolute links to resume assets; fallback to bundled Resume */}
+                    <Button
+                      href={heroLink2Url ?? Resume}
+                      variant="outline-secondary"
+                      className="d-inline-flex align-items-center ms-0"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {heroLink2Label}
+                      <span className="bootstrap-icon ms-1">
+                        <Download size={24} />
+                      </span>
+                    </Button>
                   </motion.div>
                 </div>
               </motion.div>
             </Col>
 
             <Col md={3}>
-              {/* Avatar flip effect container */}
-              <div
-                className="avatar-flip-container"
-                onClick={handleAvatarFlip}
-              >
+              <div className="avatar-flip-container" onClick={handleAvatarFlip} role="button" aria-label="Flip avatar">
                 <motion.div
                   className="avatar-flip-inner"
                   animate={{ rotateY: isFlipped ? 180 : 0 }}
                   transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+                  style={{ position: 'relative' }}
                 >
                   <motion.img
                     src={Avatar}
                     alt="Michael Njogu"
                     className="avatar-front hero-image"
                     loading="lazy"
-                    style={{ backfaceVisibility: "hidden" }}
+                    style={{ backfaceVisibility: 'hidden', width: '100%', height: 'auto', display: 'block' }}
                   />
                   <motion.img
                     src={AnimeAvatar}
@@ -336,13 +440,13 @@ const About = () => {
                     className="avatar-back hero-image"
                     loading="lazy"
                     style={{
-                      transform: "rotateY(180deg)",
-                      backfaceVisibility: "hidden",
-                      position: "absolute",
+                      transform: 'rotateY(180deg)',
+                      backfaceVisibility: 'hidden',
+                      position: 'absolute',
                       top: 0,
                       left: 0,
                       width: '100%',
-                      height: '100%'
+                      height: '100%',
                     }}
                   />
                 </motion.div>
@@ -356,18 +460,12 @@ const About = () => {
       <section className="content-section">
         <Container>
           <h2>Skills &amp; Tools</h2>
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="skills-container"
-          >
+          <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }} className="skills-container">
             <motion.div variants={fadeInUp} className="skill-list mb-5">
               <h3 className="mb-4">Key Skills</h3>
               <ul>
                 {skills.map((skill, idx) => (
-                  <motion.li key={`${skill}-${idx}`} className="skill-chip" variants={fadeInUp}>
+                  <motion.li key={`${String(skill)}-${idx}`} className="skill-chip" variants={fadeInUp}>
                     {skill}
                   </motion.li>
                 ))}
@@ -381,7 +479,7 @@ const About = () => {
                   <motion.li key={tool.id} variants={fadeInUp}>
                     <div className="tool-icon">
                       {tool.iconUrl ? (
-                        <img loading="lazy" src={tool.iconUrl} alt={`${tool.name} icon`} className={tool.inverted ? "inverted" : ""}/>
+                        <img loading="lazy" src={tool.iconUrl} alt={`${tool.name} icon`} className={tool.inverted ? 'inverted' : ''} />
                       ) : (
                         <div style={{ width: 40, height: 40, background: '#eee', borderRadius: 6 }} />
                       )}
@@ -399,45 +497,27 @@ const About = () => {
       </section>
 
       {/* Work Experience */}
-      <motion.section
-        className="content-section bg-secondary"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        variants={fadeInUp}
-      >
+      <motion.section className="content-section bg-secondary" initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp}>
         <Container>
           <h2>Work Experience</h2>
-          {/* If we have experience from Contentful, pass it to Timeline; otherwise, show a friendly placeholder */}
           <Timeline items={hasExperience ? experience : undefined} />
-          {!hasExperience && (
-            <p className="text-muted mt-4">
-              Experience highlights are being updated—check back soon.
-            </p>
-          )}
+          {!hasExperience && <p className="text-muted mt-4">Experience highlights are being updated—check back soon.</p>}
         </Container>
       </motion.section>
 
-      {/* Learning Section / Certifications */}
-      <motion.section
-        className="content-section"
-        variants={staggerContainer}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-      >
+      {/* Learning & Certifications */}
+      <motion.section className="content-section" variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }}>
         <Container>
           <h2 className="section-title">Learning &amp; Certifications</h2>
           <div className="learning-cards">
-            {/* prefer contentful certifications if available */}
             {(certifications && certifications.length ? certifications : FALLBACK_LEARNING).map((cert) => {
-              const key = cert.id ?? cert.title;
+              const key = cert.id ?? cert.title ?? JSON.stringify(cert);
               const title = cert.title ?? 'Certification';
-              const source = cert.institution ?? cert.source ?? 'Independent study';
+              const source = cert.institution ?? 'Independent study';
               const dateAttained = cert.dateAttained ?? 'Date not specified';
-              const link = cert.inProgress ? null : cert.credentialUrl ?? cert.link ?? null;
-              const icon = cert.iconUrl ?? cert.icon ?? null;
-              const alt = cert.alt ?? `${title} badge`;
+              const link = cert.inProgress ? null : cert.credentialUrl ?? null;
+              const icon = cert.iconUrl ?? null;
+              const alt = `${title} badge`;
               const inverted = cert.inverted ?? false;
               const inProgress = cert.inProgress ?? false;
 
@@ -445,7 +525,7 @@ const About = () => {
                 <motion.div key={key} variants={fadeInUp}>
                   <div className="learning-card">
                     <div className="learning-card-img">
-                      {icon ? <img src={icon} alt={alt} className={inverted ? "inverted" : ""} loading="lazy" /> : <div style={{width:64,height:64,background:'#f3f3f3'}} />}
+                      {icon ? <img src={icon} alt={alt} className={inverted ? 'inverted' : ''} loading="lazy" /> : <div style={{ width: 64, height: 64, background: '#f3f3f3' }} />}
                     </div>
                     <div className="learning-card-text">
                       <span className="card-date">{!inProgress ? dateAttained : 'Ongoing'}</span>
@@ -460,13 +540,7 @@ const About = () => {
                         </a>
                       ) : (
                         <span className="d-inline-flex align-items-center gap-2">
-                          <Spinner 
-                            animation="grow" 
-                            size="sm" 
-                            role="status" 
-                            aria-hidden="true"
-                            className="in-progress-spinner"
-                          />
+                          <Spinner animation="grow" size="sm" role="status" aria-hidden="true" className="in-progress-spinner" />
                           <span>In progress</span>
                         </span>
                       )}
@@ -478,9 +552,8 @@ const About = () => {
           </div>
         </Container>
       </motion.section>
-
     </div>
   );
-}
+};
 
 export default About;
