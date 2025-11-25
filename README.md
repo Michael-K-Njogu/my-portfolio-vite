@@ -87,13 +87,23 @@ A modern, performant portfolio website built with React, TypeScript, Vite, and C
 
 ```
 my-portfolio-vite/
-├── public/                # Static assets
-│   ├── images/            # Image assets
-│   └── robots.txt         # SEO crawler instructions
+├── public/                  # Static assets
+│   ├── images/             # Image assets
+│   │   └── icons/          # Favicon and app icons
+│   └── robots.txt          # SEO crawler instructions
 ├── src/
-│   ├── components/        # React components
-│   │   ├── layout/        # Layout components (Header, Footer)
-│   │   └── ui/            # Reusable UI components
+│   ├── components/         # React components
+│   │   ├── AllCaseStudies.tsx    # Case studies listing page
+│   │   ├── CaseStudyDetail.tsx   # Individual case study page
+│   │   ├── layout/               # Layout components
+│   │   │   ├── Header.tsx        # Navigation header with theme toggle
+│   │   │   └── Footer.tsx        # Footer with social links
+│   │   └── ui/                   # Reusable UI components
+│   │       ├── BackToTop.tsx     # Scroll-to-top button
+│   │       ├── Hero.tsx          # Homepage hero section
+│   │       ├── LoadingSpinner.tsx # Animated loading component
+│   │       ├── ProjectNav.tsx    # Case study navigation
+│   │       └── Timeline.tsx      # Experience timeline
 │   ├── pages/             # Route pages
 │   │   ├── About.tsx      # About/Profile page
 │   │   ├── NotFound.tsx   # 404 page
@@ -102,7 +112,7 @@ my-portfolio-vite/
 │   │   └── main.css       # Main stylesheet
 │   ├── docs/              # Static documents (resume, etc.)
 │   ├── images/            # Local image assets
-│   ├── App.jsx            # Main App component
+│   ├── App.jsx            # Main App component with routing
 │   ├── main.tsx           # Application entry point
 │   ├── contentfulClient.ts # Contentful client configuration
 │   └── vite-env.d.ts      # Vite environment types
@@ -137,6 +147,25 @@ npm run lint         # Run ESLint on all files
 - Smooth transitions with Framer Motion
 - Icon animation on theme switch
 
+### Custom Loading Spinner
+- Reusable `LoadingSpinner` component with animated ring and pulsing dots
+- Supports randomized loading messages from an array
+- Configurable sizes: `sm`, `md`, `lg`
+- Theme-aware using CSS variables
+- Used across all async data loading states
+
+**Usage Examples:**
+```tsx
+// Single message
+<LoadingSpinner message="Loading profile..." />
+
+// Randomized messages
+<LoadingSpinner messages={["Fetching data…", "Almost there…", "Loading…"]} />
+
+// Custom size and height
+<LoadingSpinner size="lg" minHeight="100vh" />
+```
+
 ### Email Obfuscation
 - Client-side email assembly to prevent bot scraping
 - Character code encoding for enhanced protection
@@ -154,7 +183,8 @@ The portfolio pulls content dynamically from Contentful for:
 - Smooth page transitions
 - Staggered list animations
 - Interactive hover states
-- Loading skeletons
+- Scroll progress indicator on case study pages
+- Avatar flip animation on Profile page
 
 ## 🔧 Configuration
 
@@ -163,19 +193,29 @@ The portfolio pulls content dynamically from Contentful for:
 Expected content types in Contentful:
 
 1. **`caseStudy`** - Portfolio projects
-   - Fields: title, description, images, links, tags, order
+   - Fields: title, subtitle, slug, isFeatured, featuredImage, organization, hasNda
+   - Rich text fields: overview, context, designProcess, results, takeaways
+   - Arrays: role, team, skills
+   - Order field for sorting
 
 2. **`aboutPage`** - About page content
-   - Fields: hero title/subtitle, skills, tools, experience, certifications
+   - Fields: aboutHeroTitle, aboutHeroSubtitle, aboutHeroPrimaryLinkLabel, aboutHeroPrimaryLinkUrl
+   - Resume: uploadResume (asset), uploadResumeTitle
+   - Arrays: coreSkills (text), coreTools (references), experience (references), certifications (references)
 
 3. **`tool`** - Tools & technologies
-   - Fields: toolName, toolPurpose, toolIcon, toolIconInverted
+   - Fields: toolName, toolPurpose, toolIcon (asset), toolIconInverted (boolean)
 
 4. **`experience`** - Work history
-   - Fields: jobTitle, organization, duration, description, importance
+   - Fields: jobTitle, organization, duration, jobDescription
+   - Optional: importance ('standard' | 'highlight'), organizationLogo (asset)
 
 5. **`certification`** - Certifications & badges
-   - Fields: certTitle, institution, dateAttained, credentialUrl, logo
+   - Fields: certTitle, institution, dateAttained, credentialUrl
+   - Optional: inProgress (boolean), institutionLogo (asset), institutionLogoInverted (boolean)
+
+6. **`imageGallery`** - Embedded image galleries
+   - Fields: title, images (array of assets), showCaptions (boolean)
 
 ### TypeScript Configuration
 
@@ -285,7 +325,9 @@ This project is private and proprietary.
 - [Vite](https://vitejs.dev/) - Build tool
 - [Framer Motion](https://www.framer.com/motion/) - Animation library
 - [React Bootstrap](https://react-bootstrap.github.io/) - UI components
+- [React Medium Image Zoom](https://github.com/rpearce/react-medium-image-zoom) - Image zoom functionality
+- [IAAP](https://www.accessibilityassociation.org/) - Accessibility best practices
 
 ---
 
-Made with ❤️ using React, TypeScript, and Contentful
+Built with ❤️ using React, TypeScript, Vite, and Contentful
