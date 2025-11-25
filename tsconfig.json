@@ -12,6 +12,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "strict": false,
+    "types": ["vite/client"],
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
