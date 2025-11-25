@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { Person, People, Nut } from 'react-bootstrap-icons';
 import { Container } from 'react-bootstrap';
 import ProjectNav from './ui/ProjectNav';
+import LoadingSpinner from './ui/LoadingSpinner';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import Zoom from 'react-medium-image-zoom';
 import 'react-medium-image-zoom/dist/styles.css';
@@ -201,39 +202,20 @@ const CaseStudyDetail: React.FC = () => {
     }
   }, [loading, caseStudy]);
 
-  // Theme-aware animated loader
+  // Loading state
   if (loading) {
-    const dotColor = isDark ? '#60a5fa' : '#1e3a8a';
     return (
-      <div
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-          padding: '1.5rem',
-        }}
-        aria-busy
-        aria-live="polite"
-      >
-        <div style={{ display: 'flex', gap: 10 }}>
-          {[0, 1, 2].map((i) => (
-            <motion.span
-              key={i}
-              style={{
-                width: 12,
-                height: 12,
-                borderRadius: 12,
-                background: dotColor,
-                display: 'inline-block',
-              }}
-              animate={{ y: [0, -10, 0], opacity: [1, 0.6, 1] }}
-              transition={{ repeat: Infinity, duration: 0.7, delay: i * 0.12, ease: 'easeInOut' }}
-            />
-          ))}
-        </div>
-        <div style={{ marginTop: 12, color: isDark ? '#d1d5db' : '#374151', fontSize: 14 }}>Loading case study…</div>
+      <div className="wrapper">
+        <LoadingSpinner 
+          messages={[
+            "Summoning the design magic...", 
+            "Loading the case study canvas...", 
+            "Preparing an exceptional UX experience...",
+            "Taming the UX unicorn...please hold.",
+            "Warming up the problem-solving engine...",
+          ]} 
+          minHeight="100vh" 
+        />
       </div>
     );
   }
