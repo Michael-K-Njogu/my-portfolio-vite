@@ -8,6 +8,7 @@ import AnimeAvatar from '../images/michael-anime.jpg';
 import Resume from '../docs/Michael_Njogu_CV.pdf';
 import { BoxArrowUpRight, ArrowUpRight, Download } from 'react-bootstrap-icons';
 import Timeline from '../components/ui/Timeline';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { selectClient } from '../contentfulClient';
 
 /* ----------------------
@@ -349,11 +350,17 @@ const About: React.FC = () => {
 
   if (loading) {
     return (
-      <div
-        className="wrapper"
-        style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-      >
-        <Spinner animation="border" role="status" />
+      <div className="wrapper">
+        <LoadingSpinner 
+          messages={[
+            "Spinning up the UX backstory engine...",
+            "Collecting design sparkles and origin stories...",
+            "Unveiling the design journey...",
+            "Activating designer lore...",
+            "Warming up the fun facts..."
+          ]} 
+          minHeight="100vh"
+        />
       </div>
     );
   }
