@@ -5,7 +5,7 @@ import { Container, Row, Col, Button, Spinner } from 'react-bootstrap';
 import { motion, Variants } from 'framer-motion';
 import Avatar from '../images/michael-njogu.jpg';
 import AnimeAvatar from '../images/michael-anime.jpg';
-import Resume from '../docs/Michael_Njogu_CV.pdf';
+import Resume from '../docs/Michael_Njogu_CV_Latest.pdf';
 import { BoxArrowUpRight, ArrowUpRight, Download } from 'react-bootstrap-icons';
 import Timeline from '../components/ui/Timeline';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
