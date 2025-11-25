@@ -1,25 +1,26 @@
-import { useEffect, useState, useMemo } from 'react'
-import { Navbar, Container, Nav } from 'react-bootstrap'
-import { NavLink } from 'react-router-dom'
-import { Sun, Moon, List } from 'react-bootstrap-icons'
-import { motion, AnimatePresence } from "motion/react"
+// src/components/layout/Header.tsx
+import React, { useEffect, useState, useMemo } from "react";
+import { Navbar, Container, Nav } from "react-bootstrap";
+import { NavLink } from "react-router-dom";
+import { Sun, Moon, List } from "react-bootstrap-icons";
+import { motion, AnimatePresence } from "motion/react";
 
-// --- Animation Variants ---
+/* Animation variants */
 const letterVariants = {
   hidden: { opacity: 0, y: "0.25em", filter: "blur(4px)" },
   visible: {
     opacity: 1,
     y: "0em",
     filter: "blur(0px)",
-    transition: { duration: 0.3, ease: "easeOut" },
+    transition: { duration: 0.3 },
   },
   exit: {
     opacity: 0,
     y: "-0.25em",
     filter: "blur(4px)",
-    transition: { duration: 0.25, ease: "easeIn" },
+    transition: { duration: 0.25 },
   },
-}
+};
 
 const nameContainer = {
   hidden: { opacity: 0 },
@@ -31,41 +32,34 @@ const nameContainer = {
     opacity: 0,
     transition: { staggerChildren: 0.04, staggerDirection: -1 },
   },
-}
+};
 
-const Header = () => {
-  // Keep dark mode toggle and animations intact
-  const [isDarkMode, setIsDarkMode] = useState(false)
-  const name = useMemo(() => "Michael Njogu".split(""), [])
+const Header: React.FC = () => {
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
 
-  // ❌ Removed auto-hide for full name (so it never switches to "MN")
-  // useEffect(() => {
-  //   const timer = setTimeout(() => setShowFullName(false), 2000)
-  //   return () => clearTimeout(timer)
-  // }, [])
+  // Memoized array of characters for animated brand
+  const name = useMemo<string[]>(() => "Michael Njogu".split(""), []);
 
   // Initialize theme based on saved preference
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const isDark = savedTheme === 'dark'; // only dark if explicitly saved
-
+    const savedTheme = localStorage.getItem("theme");
+    const isDark = savedTheme === "dark";
     setIsDarkMode(isDark);
-    document.body.classList.toggle('theme-dark', isDark);
+    document.body.classList.toggle("theme-dark", isDark);
 
-    // If no preference saved, force light mode
     if (!savedTheme) {
-      localStorage.setItem('theme', 'light');
-      document.body.classList.remove('theme-dark');
+      // default to light mode if nothing saved
+      localStorage.setItem("theme", "light");
+      document.body.classList.remove("theme-dark");
     }
   }, []);
 
-  // Toggle theme and save preference
-  const toggleTheme = () => {
-    const newTheme = !isDarkMode
-    setIsDarkMode(newTheme)
-    document.body.classList.toggle('theme-dark', newTheme)
-    localStorage.setItem('theme', newTheme ? 'dark' : 'light')
-  }
+  const toggleTheme = (): void => {
+    const newTheme = !isDarkMode;
+    setIsDarkMode(newTheme);
+    document.body.classList.toggle("theme-dark", newTheme);
+    localStorage.setItem("theme", newTheme ? "dark" : "light");
+  };
 
   return (
     <header>
@@ -83,7 +77,6 @@ const Header = () => {
             {/* Brand Logo Animation */}
             <Navbar.Brand href="/" className="flex items-center">
               <div className="relative inline-block select-none">
-                {/* ✅ Always display full name */}
                 <motion.span
                   key="full"
                   layoutId="brandText"
@@ -106,7 +99,7 @@ const Header = () => {
               </div>
             </Navbar.Brand>
 
-            {/* Right-side controls (theme + menu) */}
+            {/* Right-side controls */}
             <div className="flex items-center gap-3">
               {/* Theme toggle button */}
               <motion.button
@@ -114,6 +107,7 @@ const Header = () => {
                 aria-label="Toggle light/dark mode"
                 className="theme-toggle border-0 bg-transparent cursor-pointer"
                 whileTap={{ scale: 0.9 }}
+                type="button"
               >
                 <AnimatePresence mode="wait" initial={false}>
                   {isDarkMode ? (
@@ -124,7 +118,9 @@ const Header = () => {
                       exit={{ opacity: 0, rotate: 90 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <span className="bootstrap-icon"><Moon size={24} /></span>
+                      <span className="bootstrap-icon">
+                        <Moon size={24} />
+                      </span>
                     </motion.span>
                   ) : (
                     <motion.span
@@ -134,17 +130,16 @@ const Header = () => {
                       exit={{ opacity: 0, rotate: -90 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <span className="bootstrap-icon"><Sun size={24} /></span>
+                      <span className="bootstrap-icon">
+                        <Sun size={24} />
+                      </span>
                     </motion.span>
                   )}
                 </AnimatePresence>
               </motion.button>
 
               {/* Navbar toggle for mobile */}
-              <Navbar.Toggle
-                aria-controls="basic-navbar-nav"
-                className="border-0"
-              >
+              <Navbar.Toggle aria-controls="basic-navbar-nav" className="border-0">
                 <List size={28} />
               </Navbar.Toggle>
             </div>
@@ -153,11 +148,10 @@ const Header = () => {
             <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="ms-auto" as="ul">
                 <Nav.Item as="li">
-                  <Nav.Link
-                    as={NavLink}
+                  <NavLink
                     to="/"
-                    className={({ isActive }) =>
-                      `transition-colors duration-300 ${
+                    className={({ isActive }: { isActive: boolean }) =>
+                      `nav-link transition-colors duration-300 ${
                         isActive
                           ? "text-white border-b-2 border-white"
                           : "text-gray-300 hover:text-white"
@@ -165,14 +159,14 @@ const Header = () => {
                     }
                   >
                     My Work
-                  </Nav.Link>
+                  </NavLink>
                 </Nav.Item>
+
                 <Nav.Item as="li">
-                  <Nav.Link
-                    as={NavLink}
+                  <NavLink
                     to="/about"
-                    className={({ isActive }) =>
-                      `transition-colors duration-300 ${
+                    className={({ isActive }: { isActive: boolean }) =>
+                      `nav-link transition-colors duration-300 ${
                         isActive
                           ? "text-white border-b-2 border-white"
                           : "text-gray-300 hover:text-white"
@@ -180,7 +174,7 @@ const Header = () => {
                     }
                   >
                     About Me
-                  </Nav.Link>
+                  </NavLink>
                 </Nav.Item>
               </Nav>
             </Navbar.Collapse>
@@ -188,7 +182,7 @@ const Header = () => {
         </Navbar>
       </motion.div>
     </header>
-  )
-}
+  );
+};
 
-export default Header
+export default Header;
