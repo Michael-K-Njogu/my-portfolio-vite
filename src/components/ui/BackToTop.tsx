@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react";
+// src/components/ui/BackToTop.tsx
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUp } from "react-bootstrap-icons";
 
-const BackToTop = () => {
-  const [isVisible, setIsVisible] = useState(false);
+const BackToTop: React.FC = () => {
+  const [isVisible, setIsVisible] = useState<boolean>(false);
 
   // Track scroll position
   useEffect(() => {
-    const handleScroll = () => {
+    const handleScroll = (): void => {
       const scrolled = window.scrollY;
       setIsVisible(scrolled > 400); // show after 400px scroll
     };
@@ -16,8 +17,8 @@ const BackToTop = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Scroll smoothly to top
-  const scrollToTop = () => {
+  // Smooth scroll to top
+  const scrollToTop = (): void => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -33,6 +34,7 @@ const BackToTop = () => {
           onClick={scrollToTop}
           aria-label="Back to top"
           className="back-to-top"
+          type="button"
         >
           <ArrowUp size={20} />
         </motion.button>
