@@ -1,49 +1,86 @@
-import { useEffect, useState } from 'react';
+// src/pages/CaseStudyDetail.tsx
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Person, People, Nut } from 'react-bootstrap-icons';
 import { Container } from 'react-bootstrap';
 import ProjectNav from './ui/ProjectNav';
-import { motion, useScroll, useSpring } from 'framer-motion'; // <-- added
-import Zoom from 'react-medium-image-zoom'
-import "react-medium-image-zoom/dist/styles.css";
+import { motion, useScroll, useSpring } from 'framer-motion';
+import Zoom from 'react-medium-image-zoom';
+import 'react-medium-image-zoom/dist/styles.css';
 
 /* Contentful */
-import { selectClient } from '../contentfulClient'
-import { documentToReactComponents } from '@contentful/rich-text-react-renderer';
+import { selectClient } from '../contentfulClient';
+import { documentToReactComponents, Options as RichTextOptions } from '@contentful/rich-text-react-renderer';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
 import { ContentfulLivePreview } from '@contentful/live-preview';
 import { ContentfulLivePreviewProvider, useContentfulLiveUpdates } from '@contentful/live-preview/react';
+import type { Document } from '@contentful/rich-text-types';
 
-const CaseStudyDetail = () => {
-  const { slug } = useParams();
-  const [caseStudy, setCaseStudy] = useState(null);
-  const liveEntry = useContentfulLiveUpdates(caseStudy);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [headings, setHeadings] = useState([]);
+/* ---------------------------
+   Types
+   --------------------------- */
+type ContentfulSys = { id?: string; [k: string]: any };
 
-  useEffect(() => {
-    if (caseStudy?.fields?.title) {
-      document.title = `${caseStudy.fields.title} – Michael Njogu`;
-    } else {
-      document.title = "Michael Njogu - Strategic Product Designer";
-    }
+type ContentfulFile = {
+  url?: string;
+  details?: any;
+  fileName?: string;
+  contentType?: string;
+};
 
-    // Optional cleanup: reset when unmounting
-    return () => {
-      document.title = "Michael Njogu – Strategic Product Designer";
-    };
-  }, [caseStudy]);    
+type ContentfulAssetFields = {
+  title?: string;
+  description?: string;
+  file?: ContentfulFile;
+  [k: string]: any;
+};
 
-  // theme detection for loader color (reads once on mount)
-  const [isDark, setIsDark] = useState(false);
-  useEffect(() => {
-    try {
-      setIsDark(Boolean(document.body.classList.contains('theme-dark')));
-    } catch (e) {
-      setIsDark(false);
-    }
-  }, []);
+type CaseStudyFields = {
+  title?: string;
+  subtitle?: string;
+  slug?: string;
+  hasNda?: boolean;
+  organization?: string;
+  overview?: Document | null;
+  overviewTitle?: string;
+  context?: Document | null;
+  contextTitle?: string;
+  designProcess?: Document | null;
+  processTitle?: string;
+  results?: Document | null;
+  resultsTitle?: string;
+  takeaways?: Document | null;
+  takeawaysTitle?: string;
+  role?: string[] | null;
+  team?: string[] | null;
+  skills?: string[] | null;
+  [k: string]: any;
+};
+
+type CaseStudyEntry = {
+  sys: ContentfulSys;
+  fields: CaseStudyFields;
+};
+
+/* ---------------------------
+   Utilities
+   --------------------------- */
+
+const safeArray = <T,>(maybe?: T[] | null): T[] => (Array.isArray(maybe) ? maybe : []);
+
+/* ---------------------------
+   Component
+   --------------------------- */
+
+const CaseStudyDetail: React.FC = () => {
+  const { slug } = useParams<{ slug: string }>();
+  const [caseStudy, setCaseStudy] = useState<CaseStudyEntry | null>(null);
+  // liveEntry will be null in environments where live updates are not enabled; typings are loose here
+  const liveEntry = useContentfulLiveUpdates(caseStudy as any) as CaseStudyEntry | null;
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [headings, setHeadings] = useState<{ id: string; title: string }[]>([]);
+  const [isDark, setIsDark] = useState<boolean>(false);
 
   // Framer Motion scroll progress hook
   const { scrollYProgress } = useScroll();
@@ -53,108 +90,135 @@ const CaseStudyDetail = () => {
     restDelta: 0.001,
   });
 
-  // ✅ Smoothly reset scroll + progress bar when slug changes
+  // Read theme once (safe guard for SSR)
   useEffect(() => {
-    // Scroll to top smoothly
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    try {
+      setIsDark(typeof document !== 'undefined' && document.body.classList.contains('theme-dark'));
+    } catch {
+      setIsDark(false);
+    }
+  }, []);
 
-    // Animate the progress bar reset to 0
-    const resetAnimation = async () => {
-      // Immediately set spring control to its current value
-      const currentValue = scrollYProgress.get();
+  // Update document title when entry changes
+  useEffect(() => {
+    if (caseStudy?.fields?.title) {
+      document.title = `${caseStudy.fields.title} – Michael Njogu`;
+    } else {
+      document.title = 'Michael Njogu - Strategic Product Designer';
+    }
 
-      // Use a springy reset animation
-      const duration = 0.5; // seconds
-      const startTime = performance.now();
-
-      const animate = (time) => {
-        const elapsed = (time - startTime) / 1000;
-        const t = Math.min(elapsed / duration, 1);
-        // easeOutQuad
-        const eased = 1 - (1 - t) * (1 - t);
-        const newValue = currentValue * (1 - eased);
-        scrollYProgress.set(newValue);
-
-        if (t < 1) requestAnimationFrame(animate);
-      };
-
-      requestAnimationFrame(animate);
+    return () => {
+      document.title = 'Michael Njogu – Strategic Product Designer';
     };
+  }, [caseStudy]);
 
-    resetAnimation();
+  // Reset scroll & progress when slug changes
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // try to nudge scrollYProgress back toward 0 safely if available
+    try {
+      const current = scrollYProgress.get();
+      // simple linear step back over ~400ms
+      const duration = 400;
+      const start = performance.now();
+      const step = (now: number) => {
+        const t = Math.min(1, (now - start) / duration);
+        scrollYProgress.set(current * (1 - t));
+        if (t < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    } catch {
+      // ignore when not available
+    }
   }, [slug, scrollYProgress]);
 
+  // Fetch case study entry from Contentful
   useEffect(() => {
-
     let mounted = true;
     setLoading(true);
-    setError(null);    
+    setError(null);
 
-    // Determine if preview mode is enabled
-    const usePreview = window.location.search.includes('preview=true');
+    // safe preview detection
+    const usePreview = typeof window !== 'undefined' && window.location.search.includes('preview=true');
     const client = selectClient(usePreview);
 
-    client
-      .getEntries({
-        content_type: 'caseStudy',
-        'fields.slug': slug,
-        include: 10,  
-      })
-      .then((response) => {
+    (async () => {
+      try {
+        const res = await client.getEntries?.({
+          content_type: 'caseStudy',
+          'fields.slug': slug,
+          include: 10,
+        });
+
         if (!mounted) return;
-        const item = response?.items?.[0];
+
+        const item = res?.items?.[0] as CaseStudyEntry | undefined;
+
         if (!item) {
           setError('Case study not found');
           setCaseStudy(null);
         } else {
           setCaseStudy(item);
         }
-      })
-      .catch((err) => {
+      } catch (err: any) {
         console.error('Contentful fetch error:', err);
-        setError('Failed to load case study');
-      })
-      .finally(() => {
+        setError(err?.message ?? 'Failed to load case study');
+        setCaseStudy(null);
+      } finally {
         if (mounted) setLoading(false);
-      });
+      }
+    })();
 
     return () => {
       mounted = false;
     };
-  }, [slug]); 
+  }, [slug]);
 
-useEffect(() => {
-  if (!loading && caseStudy) {
-    // Find all <h2> inside .project-section
-    const sectionHeadings = Array.from(document.querySelectorAll(".project-section h2"));
-    const newHeadings = sectionHeadings.map((el) => ({
-      id: el.id || el.textContent.toLowerCase().replace(/\s+/g, "-"),
-      title: el.textContent.trim(),
-    }));
+  // Build headings for ProjectNav after content is rendered
+  useEffect(() => {
+    if (!loading && caseStudy) {
+      try {
+        // Find all h2 within .project-section
+        const sectionHeadings = Array.from(document.querySelectorAll('.project-section h2')) as HTMLHeadingElement[];
+        const newHeadings = sectionHeadings.map((el) => {
+          const text = el.textContent?.trim() ?? '';
+          const id = el.id || text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
+          return { id, title: text || 'Section' };
+        });
 
-    // Ensure headings have unique IDs (for anchor links)
-    sectionHeadings.forEach((el, i) => {
-      if (!el.id) el.id = newHeadings[i].id;
-    });
+        // Ensure headings have unique IDs
+        sectionHeadings.forEach((el, i) => {
+          if (!el.id) el.id = newHeadings[i]?.id ?? `heading-${i}`;
+        });
 
-    setHeadings(newHeadings);
-  }
-}, [loading, caseStudy]);  
+        setHeadings(newHeadings);
+      } catch {
+        setHeadings([]);
+      }
+    }
+  }, [loading, caseStudy]);
 
-  // REPLACED TEXT LOADER WITH ANIMATED LOADER (theme-aware)
+  // Theme-aware animated loader
   if (loading) {
-    const dotColor = isDark ? '#1e3a8a' : '#3b82f6'; // light gray in dark mode, bootstrap blue in light
+    const dotColor = isDark ? '#60a5fa' : '#1e3a8a';
     return (
-      <div style={{
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexDirection: 'column',
-        padding: '1.5rem'
-      }}>
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'column',
+          padding: '1.5rem',
+        }}
+        aria-busy
+        aria-live="polite"
+      >
         <div style={{ display: 'flex', gap: 10 }}>
-          {[0,1,2].map(i => (
+          {[0, 1, 2].map((i) => (
             <motion.span
               key={i}
               style={{
@@ -162,371 +226,287 @@ useEffect(() => {
                 height: 12,
                 borderRadius: 12,
                 background: dotColor,
-                display: 'inline-block'
+                display: 'inline-block',
               }}
-              animate={{
-                y: [0, -10, 0],
-                opacity: [1, 0.6, 1]
-              }}
-              transition={{
-                repeat: Infinity,
-                duration: 0.7,
-                delay: i * 0.12,
-                ease: 'easeInOut'
-              }}
+              animate={{ y: [0, -10, 0], opacity: [1, 0.6, 1] }}
+              transition={{ repeat: Infinity, duration: 0.7, delay: i * 0.12, ease: 'easeInOut' }}
             />
           ))}
         </div>
-        <div style={{ marginTop: 12, color: isDark ? '#d1d5db' : '#374151', fontSize: 14 }}>
-          <span className="loading">Loading case study…</span>
-        </div>
+        <div style={{ marginTop: 12, color: isDark ? '#d1d5db' : '#374151', fontSize: 14 }}>Loading case study…</div>
       </div>
     );
   }
 
-  if (error) return <p className="p-6 text-red-500">{error}</p>;
-  const entry = liveEntry || caseStudy;
-  if (!entry) return <p className="p-6 text-gray-500">No case study data.</p>;
+  if (error) {
+    return (
+      <div className="wrapper">
+        <Container>
+          <p className="p-6 text-danger" role="alert">
+            {error}
+          </p>
+        </Container>
+      </div>
+    );
+  }
 
-  const { 
-    title, 
-    subtitle, 
-    hasNda, 
+  const entry = (liveEntry || caseStudy) as CaseStudyEntry | null;
+  if (!entry) {
+    return (
+      <div className="wrapper">
+        <Container>
+          <p className="p-6 text-muted">No case study data.</p>
+        </Container>
+      </div>
+    );
+  }
+
+  const {
+    title,
+    subtitle,
+    hasNda,
     organization,
     overview,
-    overviewTitle, 
-    team, 
-    role, 
+    overviewTitle,
+    team,
+    role,
     skills,
-    contextTitle, 
-    processTitle, 
-    resultsTitle, 
+    contextTitle,
+    processTitle,
+    resultsTitle,
     takeawaysTitle,
-    context, 
+    context,
     designProcess,
     results,
-    takeaways
-  } = entry.fields;
+    takeaways,
+  } = entry.fields ?? ({} as CaseStudyFields);
 
-  // Optional: customize how specific elements render
-  const createRenderOptions = (entryId, fieldId) => ({
-    renderNode: {      
+  // Render options for Contentful Rich Text (stable function)
+  const createRenderOptions = (entryId?: string, fieldId?: string): RichTextOptions => {
+    return {
+      renderNode: {
+        [BLOCKS.HEADING_2]: (_node, children) => (
+          <h2
+            className="text-2xl font-semibold mt-6 mb-4"
+            {...(typeof ContentfulLivePreview?.getProps === 'function' && entryId && fieldId
+              ? ContentfulLivePreview.getProps({ entryId, fieldId })
+              : {})}
+          >
+            {children}
+          </h2>
+        ),
 
-        // Custom rendering for headings to add classes and IDs
-        [BLOCKS.HEADING_2]: (node, children) => {
-          return (
-            <h2 
-              className="text-2xl font-semibold mt-6 mb-4"
-              {...ContentfulLivePreview.getProps({ entryId, fieldId })}
-            >
-              {children}
-            </h2>
-          );
-        },
+        [BLOCKS.HEADING_3]: (_node, children) => (
+          <h3
+            className="mb-3"
+            {...(typeof ContentfulLivePreview?.getProps === 'function' && entryId && fieldId
+              ? ContentfulLivePreview.getProps({ entryId, fieldId })
+              : {})}
+          >
+            {children}
+          </h3>
+        ),
 
-        // Additional heading levels
-        [BLOCKS.HEADING_3]: (node, children) => {
-          return (
-            <h3 
-              className="mb-3"
-              {...ContentfulLivePreview.getProps({ entryId, fieldId })}
-            >
-              {children}
-            </h3>
-          );
-        },      
+        [BLOCKS.HEADING_4]: (_node, children) => (
+          <h4
+            className="mb-3"
+            {...(typeof ContentfulLivePreview?.getProps === 'function' && entryId && fieldId
+              ? ContentfulLivePreview.getProps({ entryId, fieldId })
+              : {})}
+          >
+            {children}
+          </h4>
+        ),
 
-        // Added H4 styling
-        [BLOCKS.HEADING_4]: (node, children) => {
-          return (
-            <h4 
-              className="mb-3"
-              {...ContentfulLivePreview.getProps({ entryId, fieldId })}
-            >
-              {children}
-            </h4>
-          );
-        },        
-        
-        // Paragraphs
-        [BLOCKS.PARAGRAPH]: (node, children) => {
-          return (
-            <p {...ContentfulLivePreview.getProps({ entryId, fieldId })}>
-              {children}
-            </p>
-          )
-        },
+        [BLOCKS.PARAGRAPH]: (_node, children) => (
+          <p
+            {...(typeof ContentfulLivePreview?.getProps === 'function' && entry.sys?.id && 'overview'
+              ? ContentfulLivePreview.getProps({ entryId: entry.sys.id, fieldId: 'overview' })
+              : {})}
+          >
+            {children}
+          </p>
+        ),
 
-        // Handle tables from Contentful Rich Text
-        [BLOCKS.TABLE]: (node, children) => (
+        [BLOCKS.TABLE]: (_node, children) => (
           <div className="table-container">
             <table className="case-study-table">
               <tbody>{children}</tbody>
             </table>
           </div>
         ),
-
-        [BLOCKS.TABLE_ROW]: (node, children) => (
-          <tr>
-            {children}
-          </tr>
-        ),
-
-        [BLOCKS.TABLE_HEADER_CELL]: (node, children) => (
-          <th>
-            {children}
-          </th>
-        ),
-
-        [BLOCKS.TABLE_CELL]: (node, children) => (
+        [BLOCKS.TABLE_ROW]: (_node, children) => <tr>{children}</tr>,
+        [BLOCKS.TABLE_HEADER_CELL]: (_node, children) => <th>{children}</th>,
+        [BLOCKS.TABLE_CELL]: (_node, children) => (
           <td
-            {...(entryId
-              ? ContentfulLivePreview.getProps({ entryId })
+            {...(typeof ContentfulLivePreview?.getProps === 'function' && entry.sys?.id
+              ? ContentfulLivePreview.getProps({ entryId: entry.sys.id, fieldId: fieldId ?? '' })
               : {})}
           >
             {children}
           </td>
-        ),        
+        ),
 
-        // Unordered Lists
-        [BLOCKS.UL_LIST]: (node, children) => {
-          return (
-            <ul 
-              {...ContentfulLivePreview.getProps({ entryId, fieldId })} 
-              className="custom-unordered-list"
-            >
-              {children}
-            </ul>
-          )
-        },       
-        
-        [BLOCKS.LIST_ITEM]: (node, children) => {
-          // Safely render child nodes inside <li>
-          const innerContent = node.content.map((childNode, i) =>
-            documentToReactComponents(childNode, {
-              renderNode: {
-                // Remove <p> inside <li>
-                [BLOCKS.PARAGRAPH]: (_node, children) => (
-                  <span key={`p-${i}`}>{children}</span>
-                ),
+        [BLOCKS.UL_LIST]: (_node, children) => (
+          <ul
+            className="custom-unordered-list"
+            {...(typeof ContentfulLivePreview?.getProps === 'function' && entry.sys?.id
+              ? ContentfulLivePreview.getProps({ entryId: entry.sys.id, fieldId: fieldId ?? '' })
+              : {})}
+          >
+            {children}
+          </ul>
+        ),
 
-                // Handle nested unordered lists correctly
-                [BLOCKS.UL_LIST]: (_node, children) => (
-                  <ul key={`ul-${i}`} className="nested-list">
-                    {children}
-                  </ul>
-                ),
+        [BLOCKS.LIST_ITEM]: (node, _children) => {
+          // Render list item's inner content while stripping paragraph wrappers
+          const inner = Array.isArray(node.content)
+            ? node.content.map((childNode, i) =>
+                documentToReactComponents(childNode as any, {
+                  renderNode: {
+                    [BLOCKS.PARAGRAPH]: (_n, children) => <span key={`p-${i}`}>{children}</span>,
+                    [BLOCKS.UL_LIST]: (_n, children) => <ul key={`ul-${i}`} className="nested-list">{children}</ul>,
+                    [BLOCKS.OL_LIST]: (_n, children) => <ol key={`ol-${i}`} className="nested-list">{children}</ol>,
+                  },
+                })
+              )
+            : null;
 
-                // Handle nested ordered lists correctly
-                [BLOCKS.OL_LIST]: (_node, children) => (
-                  <ol key={`ol-${i}`} className="nested-list">
-                    {children}
-                  </ol>
-                ),
-              },
-            })
-          );
-
-          // Apply live preview props only to the top-level <li>
           return (
             <li
-              {...ContentfulLivePreview.getProps({
-                entryId,
-                fieldId,
-              })}
+              {...(typeof ContentfulLivePreview?.getProps === 'function' && entry.sys?.id
+                ? ContentfulLivePreview.getProps({ entryId: entry.sys.id, fieldId: fieldId ?? '' })
+                : {})}
               className="custom-list-item"
             >
-              {innerContent}
+              {inner}
             </li>
           );
-        },    
+        },
 
-        // Inline hyperlinks
         [INLINES.HYPERLINK]: (node, children) => (
-          <a
-            href={node.data.uri}
-            className="text-blue-600 underline hover:text-blue-800"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href={(node as any).data?.uri} className="text-blue-600 underline hover:text-blue-800" target="_blank" rel="noopener noreferrer">
             {children}
           </a>
         ),
 
-        // Blockquotes
-        [BLOCKS.QUOTE]: (node, children) => (
-          <blockquote className="custom-blockquote">
-            {children}
-          </blockquote>
-        ),
+        [BLOCKS.QUOTE]: (_node, children) => <blockquote className="custom-blockquote">{children}</blockquote>,
 
-        // Embedded Assets (images)
         [BLOCKS.EMBEDDED_ASSET]: (node) => {
-        const target = node?.data?.target;
-        const fields = target?.fields || {};
-        const fileField = fields?.file;
-        const title = fields?.title;
-        const description = fields?.description;
+          const target = (node as any)?.data?.target;
+          const fields = target?.fields || {};
+          const fileField: ContentfulFile | undefined = fields?.file;
+          const title = fields?.title;
+          const description = fields?.description;
+          const rawUrl = fileField?.url;
+          const imageUrl = rawUrl ? (rawUrl.startsWith('//') ? `https:${rawUrl}` : rawUrl) : null;
 
-        // url can be undefined while an asset is still processing in Preview
-        const rawUrl = fileField?.url;
-        const imageUrl = rawUrl
-          ? (rawUrl.startsWith('//') ? `https:${rawUrl}` : rawUrl)
-          : null;
+          if (!imageUrl) {
+            return (
+              <figure>
+                <div className="gallery-img w-full max-h-[500px] flex items-center justify-center bg-gray-100 text-gray-500">
+                  Asset processing… it will appear here once ready.
+                </div>
+                {(title || description) && (
+                  <figcaption className="text-sm text-gray-500 mt-2 text-center">
+                    {description || title}
+                  </figcaption>
+                )}
+              </figure>
+            );
+          }
 
-        // Gracefully handle assets that are not fully processed yet
-        if (!imageUrl) {
           return (
             <figure>
-              <div
-                className="gallery-img w-full max-h-[500px] flex items-center justify-center bg-gray-100 text-gray-500"
-                {...ContentfulLivePreview.getProps({ entryId, fieldId })}
-              >
-                Asset processing… it will appear here once ready.
-              </div>
+              <Zoom>
+                {/* Live preview props if available */}
+                <img
+                  {...(typeof ContentfulLivePreview?.getProps === 'function' && entry.sys?.id
+                    ? ContentfulLivePreview.getProps({ entryId: entry.sys.id, fieldId: fieldId ?? '' })
+                    : {})}
+                  src={imageUrl}
+                  alt={description || title || ''}
+                  className="gallery-img w-full max-h-[500px] object-cover"
+                />
+              </Zoom>
               {(title || description) && (
-                <figcaption
-                  {...ContentfulLivePreview.getProps({ entryId, fieldId })}
-                  className="text-sm text-gray-500 mt-2 text-center"
-                >
-                  {description || title}
-                </figcaption>
+                <figcaption className="text-sm text-gray-500 mt-2 text-center">{description || title}</figcaption>
               )}
             </figure>
           );
-        }
+        },
 
-        return (
-          <figure>
-            <Zoom>
-              <img
-                {...ContentfulLivePreview.getProps({ entryId, fieldId })}
-                src={imageUrl}
-                alt={description || title}
-                className="gallery-img w-full max-h-[500px] object-cover"
-              />
-            </Zoom>
-            {(title || description) && (
-              <figcaption
-                {...ContentfulLivePreview.getProps({ entryId, fieldId })}
-                className="text-sm text-gray-500 mt-2 text-center"
-              >
-                {description || title}
-              </figcaption>
-            )}
-          </figure>
-        );
-        },  
-
-        // Embedded Entries (blocks)
         [BLOCKS.EMBEDDED_ENTRY]: (node) => {
-          const entry = node.data?.target;
-          if (!entry) {
-            console.warn("Missing entry data:", node);
-            return null;
+          const embedded = (node as any)?.data?.target;
+          if (!embedded) return null;
+          const contentType = embedded.sys?.contentType?.sys?.id;
+          const fields = embedded.fields || {};
+
+          // Image gallery block
+          if (contentType === 'imageGallery') {
+            const { images = [], showCaptions } = fields as any;
+            return (
+              <section className="mt-10">
+                <div className="image-grid">
+                  {Array.isArray(images) &&
+                    images.map((asset: any, i: number) => {
+                      const file = asset?.fields?.file;
+                      const fileUrl = file?.url ? (file.url.startsWith('//') ? `https:${file.url}` : file.url) : null;
+                      const title = asset?.fields?.title;
+                      const description = asset?.fields?.description;
+                      return (
+                        <div key={i} className="rounded-xl overflow-hidden shadow-md">
+                          <figure className="mb-0 mt-0">
+                            <Zoom>
+                              {fileUrl ? (
+                                <img src={fileUrl} alt={title || `Gallery image ${i + 1}`} className="gallery-img h-64 object-cover hover:scale-105 transition-transform duration-300" />
+                              ) : (
+                                <div className="gallery-img h-64 flex items-center justify-center bg-gray-100 text-gray-500">Asset processing…</div>
+                              )}
+                            </Zoom>
+
+                            {showCaptions && (title || description) && (
+                              <figcaption className="text-sm text-gray-500 mt-2 text-center">
+                                {description || title}
+                              </figcaption>
+                            )}
+                          </figure>
+                        </div>
+                      );
+                    })}
+                </div>
+              </section>
+            );
           }
 
-          const contentType = entry.sys?.contentType?.sys?.id;
-          const fields = entry.fields || {};
-
-        // Handle Image Gallery (block)
-        if (contentType === "imageGallery") {
-          const { images, showCaptions } = fields; // ✅ include the new boolean field
-
-          return (
-            <section
-              className="mt-10"
-              {...ContentfulLivePreview.getProps({
-                entryId: entry.sys.id,
-                fieldId: "images",
-              })}
-            >
-              <div className="image-grid">
-                {images?.map((asset, i) => {
-                  const { file, title, description } = asset.fields;
-                  const imageUrl = file?.url?.startsWith("//")
-                    ? `https:${file.url}`
-                    : file.url;
-
-                  return (
-                    <div
-                      key={i}
-                      className="rounded-xl overflow-hidden shadow-md"
-                      {...ContentfulLivePreview.getProps({
-                        entryId: asset.sys.id,
-                        fieldId: "file",
-                      })}
-                    >
-                      <figure className="mb-0 mt-0">
-                        <Zoom>
-                          <img
-                            src={imageUrl}
-                            alt={title || `Gallery image ${i + 1}`}
-                            className="gallery-img h-64 object-cover hover:scale-105 transition-transform duration-300"
-                          />
-                        </Zoom>
-
-                        {/* ✅ Conditionally render captions */}
-                        {showCaptions && (title || description) && (
-                          <figcaption
-                            className="text-sm text-gray-500 mt-2 text-center"
-                            {...ContentfulLivePreview.getProps({
-                              entryId: asset.sys.id,
-                              fieldId: description ? "description" : "title",
-                            })}
-                          >
-                            {description || title}
-                          </figcaption>
-                        )}
-                      </figure>
-                    </div>
-                  );
-                })}
-              </div>
-            </section>
-          );
-        }
-
-
-          // Handle fallback
-          return (
-            <div className="bg-gray-100 p-4 rounded text-sm text-gray-600">
-              Unknown embedded entry type
-            </div>
-          );
+          // fallback for unknown embedded entry types
+          return <div className="bg-gray-100 p-4 rounded text-sm text-gray-600">Unknown embedded entry type</div>;
         },
-        
+
         [INLINES.EMBEDDED_ENTRY]: (node) => {
-          const entry = node.data?.target;
-          if (!entry) return null;
+          const embedded = (node as any)?.data?.target;
+          if (!embedded) return null;
+          const contentType = embedded.sys?.contentType?.sys?.id;
+          const fields = embedded.fields || {};
 
-          const contentType = entry.sys?.contentType?.sys?.id;
-          const fields = entry.fields || {};
+          if (contentType === 'imageGallery') {
+            const title = fields?.title;
+            const media = fields?.media ?? [];
+            const urls = Array.isArray(media)
+              ? media.map((m: any) => {
+                  const file = m?.fields?.file;
+                  return file?.url ? (file.url.startsWith('//') ? `https:${file.url}` : file.url) : null;
+                }).filter(Boolean)
+              : [];
 
-          // Handle Image Gallery (inline thumbnails)
-          if (contentType === "imageGallery") {
-            const { title, media } = fields;
-            const urls = media
-              ?.map((m) => {
-                const file = m?.fields?.file;
-                return file?.url ? (file.url.startsWith("//") ? `https:${file.url}` : file.url) : null;
-              })
-              .filter(Boolean);
-
-            if (!urls?.length) return null;
+            if (!urls.length) return null;
 
             return (
               <span className="inline-block align-middle ml-2 mr-2">
                 {title && <span className="block text-xs text-gray-500 mb-1">{title}</span>}
                 <div className="inline-flex gap-2">
-                  {urls.map((u, i) => (
-                    <img
-                      key={i}
-                      src={u}
-                      alt={title || `Gallery thumbnail ${i + 1}`}
-                      className="w-16 h-16 object-cover rounded"
-                      loading="lazy"
-                    />
+                  {urls.map((u: string, i: number) => (
+                    <img key={i} src={u} alt={title || `Gallery thumbnail ${i + 1}`} className="w-16 h-16 object-cover rounded" loading="lazy" />
                   ))}
                 </div>
               </span>
@@ -535,117 +515,147 @@ useEffect(() => {
 
           return null;
         },
-                
-    }, // end renderNode
-  }); // end options 
+      },
+    };
+  };
 
-return (
-  <ContentfulLivePreviewProvider locale="en-US" enableInspectorMode enableLiveUpdates>
-    <div className="wrapper">
+  // Render rich text sections using our render options
+  const renderRichText = (doc?: Document | null, fieldId?: string) => {
+    if (!doc) return null;
+    return documentToReactComponents(doc, createRenderOptions(entry.sys?.id, fieldId));
+  };
 
-      {/* 🔹 Scroll progress bar */}
-      <motion.div 
-        className="scroll-progress" 
-        style={{ scaleX, background: isDark ? '#60a5fa' : '#1e3a8a' }} 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-      />     
-            
-            <div className="project-header">
-                <Container>
-                    <h1 className="project-title">{title}</h1>
-                    <p className="project-subtitle">{subtitle}</p>       
-                    {hasNda && (
-                            <div className="disclaimer">
-                            To comply with my Non-Disclosure Agreement (NDA) with {organization}, I have omitted certain details in this case study.
-                            </div>
-                    )}      
-                </Container>
+  const safeRole = safeArray(role);
+  const safeTeam = safeArray(team);
+  const safeSkills = safeArray(skills);
+
+  return (
+    <ContentfulLivePreviewProvider locale="en-US" enableInspectorMode enableLiveUpdates>
+      <div className="wrapper">
+        <motion.div
+          className="scroll-progress"
+          style={{ scaleX, background: isDark ? '#60a5fa' : '#1e3a8a' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+        />
+
+        <div className="project-header">
+          <Container>
+            <h1 className="project-title">{title}</h1>
+            <p className="project-subtitle">{subtitle}</p>
+            {hasNda && (
+              <div className="disclaimer">
+                To comply with my Non-Disclosure Agreement (NDA) with {organization}, I have omitted certain details in this case study.
+              </div>
+            )}
+          </Container>
+        </div>
+
+        <ProjectNav previousPageName="All Projects" links={headings.map((h) => h.title)} />
+
+        <section className="project-section-small bg-tertiary">
+          <Container>
+            <div className="project-overview">
+              <div className="project-overview-card">
+                <h5>
+                  <span className="bootstrap-icon">
+                    <Person size={24} />
+                  </span>{' '}
+                  My Role
+                </h5>
+                <ul>
+                  {safeRole.map((item, i) => (
+                    <li key={i}>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="project-overview-card">
+                <h5>
+                  <span className="bootstrap-icon">
+                    <People size={24} />
+                  </span>{' '}
+                  Team Composition
+                </h5>
+                <ul>
+                  {safeTeam.map((member, i) => (
+                    <li key={i}>
+                      <span>{member}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="project-overview-card">
+                <h5>
+                  <span className="bootstrap-icon">
+                    <Nut size={24} />
+                  </span>{' '}
+                  Skills &amp; Tools
+                </h5>
+                <ul>
+                  {safeSkills.map((skill, i) => (
+                    <li key={i}>
+                      <span>{skill}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-
-            <ProjectNav previousPage="/" previousPageName="All Projects" links={headings.map((h) => h.title)} />       
-
-            <section className="project-section-small bg-tertiary">
-                <Container>
-                    <div className="project-overview">
-                            <div className="project-overview-card">
-                                <h5><span className="bootstrap-icon"><Person size={24} /></span> My Role</h5>
-                                    <ul>
-                                        {role.map((item, i) => (
-                                            <li key={i}><span>{item}</span></li>
-                                        ))}
-                                    </ul>
-                            </div>
-                            <div className="project-overview-card">
-                                    <h5><span className="bootstrap-icon"><People size={24} /></span> Team Composition</h5>
-                                    <ul>
-                                        {team.map((member, i) => (
-                                            <li key={i}><span>{member}</span></li>
-                                        ))}
-                                    </ul>
-                            </div>         
-                            <div className="project-overview-card">
-                                    <h5><span className="bootstrap-icon"><Nut size={24} /></span> Skills &amp; Tools</h5>
-                                    <ul>
-                                        {skills.map((skill, i) => (
-                                            <li key={i}><span>{skill}</span></li>
-                                        ))}
-                                    </ul>
-                            </div>                       
-                    </div>                  
-                </Container>
+          </Container>
         </section>
 
         {overview && (
-            <section className="project-section">
-                <Container>
-                    <h2>{overviewTitle ? overviewTitle : "Overview"}</h2>
-                    {documentToReactComponents(overview, createRenderOptions(entry.sys.id, "overview"))}
-                </Container>
-            </section>
-        )}        
+          <section className="project-section">
+            <Container>
+              <h2>{overviewTitle ?? 'Overview'}</h2>
+              {renderRichText(overview, 'overview')}
+            </Container>
+          </section>
+        )}
 
         {context && (
-            <section className="project-section bg-secondary">
-                <Container>
-                    <h2>{contextTitle ? contextTitle : "Context"}</h2>
-                    {documentToReactComponents(context, createRenderOptions(entry.sys.id, "context"))}
-                </Container>
-            </section>
+          <section className="project-section bg-secondary">
+            <Container>
+              <h2>{contextTitle ?? 'Context'}</h2>
+              {renderRichText(context, 'context')}
+            </Container>
+          </section>
         )}
 
         {designProcess && (
-            <section className="project-section">
-                <Container>
-                    <h2>{processTitle ? processTitle : "Process"}</h2>
-                    {documentToReactComponents(designProcess, createRenderOptions(entry.sys.id, "designProcess"))}
-                </Container>
-            </section>
+          <section className="project-section">
+            <Container>
+              <h2>{processTitle ?? 'Process'}</h2>
+              {renderRichText(designProcess, 'designProcess')}
+            </Container>
+          </section>
         )}
 
         {results && (
-            <section className="project-section bg-secondary">
-                <Container>
-                    <h2>{resultsTitle ? resultsTitle : "Results"}</h2>
-                    {documentToReactComponents(results, createRenderOptions(entry.sys.id, "results"))}
-                </Container>
-            </section>
-        )}      
-
-        {takeaways && (
-            <section className="project-section">
-                <Container>
-                    <h2>{takeawaysTitle ? takeawaysTitle : "Takeaways"}</h2>
-                    {documentToReactComponents(takeaways, createRenderOptions(entry.sys.id, "takeaways"))}
-                </Container>
-            </section>
+          <section className="project-section bg-secondary">
+            <Container>
+              <h2>{resultsTitle ?? 'Results'}</h2>
+              {renderRichText(results, 'results')}
+            </Container>
+          </section>
         )}
 
-    </div>
-  </ContentfulLivePreviewProvider>
-);
+        {takeaways && (
+          <section className="project-section">
+            <Container>
+              <h2>{takeawaysTitle ?? 'Takeaways'}</h2>
+              {renderRichText(takeaways, 'takeaways')}
+            </Container>
+          </section>
+        )}
+      </div>
+    </ContentfulLivePreviewProvider>
+  );
 };
 
 export default CaseStudyDetail;
