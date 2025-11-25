@@ -3,7 +3,7 @@ import { Container, Row, Col, Button } from 'react-bootstrap'
 import { Link } from "react-router-dom"
 import { motion } from "motion/react"
 import { ArrowDown, Person } from 'react-bootstrap-icons'
-import Avatar from '../../images/michael-njogu.jpg'
+import Avatar from './../../images/michael-njogu.jpg'
 import AnimeAvatar from '../../images/michael-anime.jpg'
 
 const Hero = () => {
@@ -40,7 +40,7 @@ const Hero = () => {
                   <span className="bootstrap-icon"><ArrowDown size={24} /></span>
                 </Button>
 
-                <Button as={Link} to="/about" variant="outline-secondary">
+                <Button as={Link as any} to="/about" variant="outline-secondary">
                   More About Me
                   <span className="bootstrap-icon ms-1"><Person size={24} /></span>
                 </Button>
