@@ -58,7 +58,7 @@ const Footer: React.FC = () => {
                   onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
                     e.preventDefault();
                     const codes = [
-                      109, 121, 107, 101, 107, 117, 110, 121, 64, 103, 109, 97,
+                      109, 121, 107, 101, 107, 117, 110, 121, 111, 64, 103, 109, 97,
                       105, 108, 46, 99, 111, 109,
                     ];
                     const email = String.fromCharCode(...codes);
