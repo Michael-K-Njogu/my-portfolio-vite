@@ -123,7 +123,10 @@ const ProjectNav: React.FC<ProjectNavProps> = ({
       }
 
       // Update activeId immediately for snappier UI feedback
-      setActiveId(id);
+      // NOTE: do not set `activeId` here — doing so highlights the
+      // nav item before the section has actually scrolled into view.
+      // Rely on the IntersectionObserver to update `activeId` when
+      // the target section intersects the viewport.
     },
     [headerOffset, scrollContainerSelector]
   );
