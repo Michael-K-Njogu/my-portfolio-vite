@@ -159,8 +159,6 @@ blockquote p, blockquote p b {
 .navbar-blur, .navbar-light {
   background: var(--bg-blur); /* translucent dark glass */
   backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px); /* for Safari */
-  -moz-backdrop-filter: blur(12px); /* for Firefox */
   border-bottom: 1px solid var(--colour-border);
   z-index: 99; /* keeps it above content */
 }
