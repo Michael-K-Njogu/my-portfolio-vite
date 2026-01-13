@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Container } from 'react-bootstrap';
 import { ArrowLeft } from 'react-bootstrap-icons';
-import { Link } from 'react-router-dom';
+import { HashLink } from 'react-router-hash-link';
 
 type ProjectNavProps = {
   previousPageName: string;
@@ -134,12 +134,12 @@ const ProjectNav: React.FC<ProjectNavProps> = ({
   return (
     <section className="project-nav sticky-top" aria-label="Project navigation">
       <Container className="d-flex align-items-center justify-content-between">
-        <Link to="/#my-work" className="back-link" aria-label={`Back to ${previousPageName}`}>
+        <HashLink smooth to="/#my-work" className="back-link" aria-label={`Back to ${previousPageName}`}>
           <span className="bootstrap-icon" aria-hidden>
             <ArrowLeft size={24} className="me-2" />
           </span>
           <span>{previousPageName}</span>
-        </Link>
+        </HashLink>
 
         <nav aria-label="Project sections">
           <ul className="d-flex gap-3 list-unstyled mb-0">
