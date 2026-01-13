@@ -82,7 +82,7 @@ body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
     font-family: var(--font-primary);
-    font-size: 1.2rem;
+    font-size: 1rem;
     margin: 0;
     padding: 0;
 }
@@ -118,7 +118,7 @@ blockquote {
 blockquote p, blockquote p b {
     font-weight: 500 !important;
     margin: 0;
-    font-size: 1.4rem;
+    font-size: 1.2rem;
 }
 
 @media (max-width: 1023.98px) {
@@ -157,8 +157,9 @@ blockquote p, blockquote p b {
 }
 
 .navbar-blur, .navbar-light {
-  background-color: var(--bg-blur); /* translucent dark glass */
+  background: var(--bg-blur); /* translucent dark glass */
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--colour-border);
   z-index: 99; /* keeps it above content */
 }
@@ -170,7 +171,7 @@ blockquote p, blockquote p b {
     padding: 5px 20px;
 }
 
-.nav-link[aria-current="page"] {
+.nav-link.active, .nav-link:focus {
     font-weight: 500;
 }
 
@@ -191,12 +192,12 @@ blockquote p, blockquote p b {
 }
 
 .hero-title {
-    font-size: 4rem;
+    font-size: 3rem;
     margin-bottom: 24px;
 }
 
 .hero-text {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     width: 75%;
 }
 
@@ -391,7 +392,7 @@ blockquote p, blockquote p b {
 }
 
 .project-item-info h3 {
-    font-size: 2rem;
+    font-size: 1.5rem;
 }
 
 .project-item-info h3 a, .project-item-info h3 a:hover, .project-item-info h3 a:focus {
@@ -486,8 +487,8 @@ blockquote p, blockquote p b {
 }
 
 .project-title {
-    font-size: 5rem;
-    margin-bottom: 24px
+    font-size: 2.5rem;
+    margin-bottom: 24px;
 }
 
 .project-section {
@@ -505,7 +506,7 @@ blockquote p, blockquote p b {
 }
 
 .project-section h2, .content-section h2 {
-    font-size: 3rem;
+    font-size: 2rem;
     font-weight: 500 !important;
     margin-bottom: 24px;
 }
@@ -513,6 +514,7 @@ blockquote p, blockquote p b {
 .project-section h3 {
     color: var(--colour-accent-primary);
     font-weight: 500 !important;
+    font-size: 1.5rem;
     margin-top: 40px;
 }
 
@@ -528,7 +530,7 @@ blockquote p, blockquote p b {
 
 .project-subtitle {
     color: var(--text-secondary);
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     margin-bottom: 30px;
     margin-top: 8px;
 }
@@ -966,8 +968,8 @@ figcaption {
 footer {
     background-color: var(--bg-secondary);
     border-top: 1px solid var(--colour-border);
-    font-size: 1rem;
-    padding: 40px 0;
+    font-size: .875rem;
+    padding: 20px 0;
     z-index: 10;
 }
 
