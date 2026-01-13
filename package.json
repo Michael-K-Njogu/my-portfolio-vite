@@ -26,6 +26,7 @@
     "react-dom": "^19.2.0",
     "react-medium-image-zoom": "^5.4.0",
     "react-router-dom": "^7.9.6",
+    "react-router-hash-link": "^2.4.3",
     "rollup-plugin-terser": "^7.0.2"
   },
   "devDependencies": {
