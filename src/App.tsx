@@ -4,6 +4,7 @@ import { Outlet } from "react-router-dom";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import BackToTop from "./components/ui/BackToTop";
+import ScrollToTop from "./components/ScrollToTop";
 
 const App: React.FC = () => {
   useEffect(() => {
@@ -53,6 +54,7 @@ const App: React.FC = () => {
   return (
     <>
       <Header />
+      <ScrollToTop />
       <Outlet /> {/* ← Nested routes render here */}
       <BackToTop />
       <Footer />
