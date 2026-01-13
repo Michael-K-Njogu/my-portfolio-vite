@@ -403,6 +403,7 @@ const CaseStudyDetail: React.FC = () => {
               <Zoom>
                 {/* Live preview props if available */}
                 <img
+                  fetchPriority="high"
                   {...(typeof ContentfulLivePreview?.getProps === 'function' && entry.sys?.id
                     ? ContentfulLivePreview.getProps({ entryId: entry.sys.id, fieldId: fieldId ?? '' })
                     : {})}
@@ -440,8 +441,8 @@ const CaseStudyDetail: React.FC = () => {
                         <div key={i} className="rounded-xl overflow-hidden shadow-md">
                           <figure className="mb-0 mt-0">
                             <Zoom>
-                              {fileUrl ? (
-                                <img src={fileUrl} alt={title || `Gallery image ${i + 1}`} className="gallery-img h-64 object-cover hover:scale-105 transition-transform duration-300" />
+                                {fileUrl ? (
+                                <img fetchPriority="high" src={fileUrl} alt={title || `Gallery image ${i + 1}`} className="gallery-img h-64 object-cover hover:scale-105 transition-transform duration-300" />
                               ) : (
                                 <div className="gallery-img h-64 flex items-center justify-center bg-gray-100 text-gray-500">Asset processing…</div>
                               )}
@@ -488,7 +489,7 @@ const CaseStudyDetail: React.FC = () => {
                 {title && <span className="block text-xs text-gray-500 mb-1">{title}</span>}
                 <div className="inline-flex gap-2">
                   {urls.map((u: string, i: number) => (
-                    <img key={i} src={u} alt={title || `Gallery thumbnail ${i + 1}`} className="w-16 h-16 object-cover rounded" loading="lazy" />
+                    <img key={i} fetchPriority="high" src={u} alt={title || `Gallery thumbnail ${i + 1}`} className="w-16 h-16 object-cover rounded" />
                   ))}
                 </div>
               </span>
