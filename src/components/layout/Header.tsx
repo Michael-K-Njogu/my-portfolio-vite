@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Navbar, Container, Nav } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
+import { HashLink } from 'react-router-hash-link';
 import { Sun, Moon, List } from "react-bootstrap-icons";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -148,18 +149,9 @@ const Header: React.FC = () => {
             <Navbar.Collapse id="basic-navbar-nav">
               <Nav className="ms-auto" as="ul">
                 <Nav.Item as="li">
-                  <NavLink
-                    to="/"
-                    className={({ isActive }: { isActive: boolean }) =>
-                      `nav-link transition-colors duration-300 ${
-                        isActive
-                          ? "text-white border-b-2 border-white"
-                          : "text-gray-300 hover:text-white"
-                      }`
-                    }
-                  >
+                  <HashLink smooth to="/#my-work" className="nav-link transition-colors duration-300 text-gray-300 hover:text-white">
                     My Work
-                  </NavLink>
+                  </HashLink>
                 </Nav.Item>
 
                 <Nav.Item as="li">
