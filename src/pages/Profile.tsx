@@ -471,7 +471,7 @@ const About: React.FC = () => {
                   <motion.li key={tool.id} variants={fadeInUp}>
                     <div className="tool-icon">
                       {tool.iconUrl ? (
-                        <img src={tool.iconUrl} alt={`${tool.name} icon`} className={tool.inverted ? 'inverted' : ''} />
+                        <img fetchPriority="high" src={tool.iconUrl} alt={`${tool.name} icon`} className={tool.inverted ? 'inverted' : ''} />
                       ) : (
                         <div style={{ width: 40, height: 40, background: '#eee', borderRadius: 6 }} />
                       )}
@@ -517,7 +517,7 @@ const About: React.FC = () => {
                 <motion.div key={key} variants={fadeInUp}>
                   <div className="learning-card">
                     <div className="learning-card-img">
-                      {icon ? <img src={icon} alt={alt} className={inverted ? 'inverted' : ''} /> : <div style={{ width: 64, height: 64, background: '#f3f3f3' }} />}
+                      {icon ? <img fetchPriority="high" src={icon} alt={alt} className={inverted ? 'inverted' : ''} /> : <div style={{ width: 64, height: 64, background: '#f3f3f3' }} />}
                     </div>
                     <div className="learning-card-text">
                       <span className="card-date">{!inProgress ? dateAttained : 'Ongoing'}</span>
