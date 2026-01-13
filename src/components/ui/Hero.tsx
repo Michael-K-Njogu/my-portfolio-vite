@@ -63,12 +63,14 @@ const Hero = () => {
                   src={Avatar}
                   alt="Michael Njogu"
                   className="avatar-front hero-image"
+                  fetchPriority="high"
                   style={{ backfaceVisibility: "hidden" }}
                 />
                 <motion.img
                   src={AnimeAvatar}
                   alt="Anime Michael"
                   className="avatar-back hero-image"
+                  fetchPriority="high"
                   style={{
                     transform: "rotateY(180deg)",
                     backfaceVisibility: "hidden",
