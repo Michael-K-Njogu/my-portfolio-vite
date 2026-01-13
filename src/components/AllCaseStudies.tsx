@@ -225,7 +225,7 @@ const CaseStudies: React.FC = () => {
                     <Link to={`/case-studies/${slug}`}>
                       {imageUrl ? (
                         <img
-                          loading="lazy"
+                          fetchPriority="high"
                           src={imageUrl}
                           alt={fields.featuredImage?.fields?.title ?? 'Project thumbnail'}
                           className="img-fluid shadow-sm"
