@@ -438,14 +438,12 @@ const About: React.FC = () => {
                     src={Avatar}
                     alt="Michael Njogu"
                     className="avatar-front hero-image"
-                    loading="lazy"
                     style={{ backfaceVisibility: 'hidden', width: '100%', height: 'auto', display: 'block' }}
                   />
                   <motion.img
                     src={AnimeAvatar}
                     alt="Anime Michael"
                     className="avatar-back hero-image"
-                    loading="lazy"
                     style={{
                       transform: 'rotateY(180deg)',
                       backfaceVisibility: 'hidden',
@@ -486,7 +484,7 @@ const About: React.FC = () => {
                   <motion.li key={tool.id} variants={fadeInUp}>
                     <div className="tool-icon">
                       {tool.iconUrl ? (
-                        <img loading="lazy" src={tool.iconUrl} alt={`${tool.name} icon`} className={tool.inverted ? 'inverted' : ''} />
+                        <img src={tool.iconUrl} alt={`${tool.name} icon`} className={tool.inverted ? 'inverted' : ''} />
                       ) : (
                         <div style={{ width: 40, height: 40, background: '#eee', borderRadius: 6 }} />
                       )}
@@ -532,7 +530,7 @@ const About: React.FC = () => {
                 <motion.div key={key} variants={fadeInUp}>
                   <div className="learning-card">
                     <div className="learning-card-img">
-                      {icon ? <img src={icon} alt={alt} className={inverted ? 'inverted' : ''} loading="lazy" /> : <div style={{ width: 64, height: 64, background: '#f3f3f3' }} />}
+                      {icon ? <img src={icon} alt={alt} className={inverted ? 'inverted' : ''} /> : <div style={{ width: 64, height: 64, background: '#f3f3f3' }} />}
                     </div>
                     <div className="learning-card-text">
                       <span className="card-date">{!inProgress ? dateAttained : 'Ongoing'}</span>
