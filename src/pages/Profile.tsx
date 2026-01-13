@@ -6,7 +6,7 @@ import { motion, Variants } from 'framer-motion';
 import Avatar from '../images/michael-njogu.jpg';
 import AnimeAvatar from '../images/michael-anime.jpg';
 import Resume from '../docs/Michael_Njogu_CV_Latest.pdf';
-import { BoxArrowUpRight, ArrowUpRight, Download } from 'react-bootstrap-icons';
+import { BoxArrowUpRight, ArrowUpRight } from 'react-bootstrap-icons';
 import Timeline from '../components/ui/Timeline';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import { selectClient } from '../contentfulClient';
@@ -188,8 +188,8 @@ const About: React.FC = () => {
     heroSubtitle,
     heroLink1Label,
     heroLink1Url,
-    heroLink2Label,
-    heroLink2Url,
+    //heroLink2Label,
+    //heroLink2Url,
     skills,
     tools,
     experience,
@@ -204,8 +204,8 @@ const About: React.FC = () => {
       "I learn by doing, exploring possibilities, experimenting with solutions, and adapting as I discover what works.";
     const heroLink1Label = fields.aboutHeroPrimaryLinkLabel ?? 'View my work';
     const heroLink1Url = fields.aboutHeroPrimaryLinkUrl ?? '/';
-    const heroLink2Label = fields.uploadResumeTitle ?? 'Download my resume';
-    const heroLink2Url = toAssetUrl(fields.uploadResume) ?? Resume;
+    //const heroLink2Label = fields.uploadResumeTitle ?? 'Download my resume';
+    //const heroLink2Url = toAssetUrl(fields.uploadResume) ?? Resume;
 
     // skills
     const skillsRaw: string[] | undefined = fields.coreSkills;
@@ -288,8 +288,8 @@ const About: React.FC = () => {
       heroSubtitle,
       heroLink1Label,
       heroLink1Url,
-      heroLink2Label,
-      heroLink2Url,
+      //heroLink2Label,
+      //heroLink2Url,
       skills,
       tools,
       experience,
@@ -375,7 +375,7 @@ const About: React.FC = () => {
     );
   }
 
-  const hero2IsPdfPath = typeof heroLink2Url === 'string' && heroLink2Url.endsWith('.pdf');
+  //const hero2IsPdfPath = typeof heroLink2Url === 'string' && heroLink2Url.endsWith('.pdf');
 
   return (
     <div className="wrapper">
@@ -407,21 +407,6 @@ const About: React.FC = () => {
                     )}
                   </motion.div>
 
-                  <motion.div>
-                    {/* Prefer absolute links to resume assets; fallback to bundled Resume */}
-                    <Button
-                      href={heroLink2Url ?? Resume}
-                      variant="outline-secondary"
-                      className="d-inline-flex align-items-center ms-0"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {heroLink2Label}
-                      <span className="bootstrap-icon ms-1">
-                        <Download size={24} />
-                      </span>
-                    </Button>
-                  </motion.div>
                 </div>
               </motion.div>
             </Col>
