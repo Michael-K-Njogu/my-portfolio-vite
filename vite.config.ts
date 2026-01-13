@@ -161,10 +161,13 @@ export default defineConfig(({ mode }) => {
         'react-dom',
         'react-router-dom',
       ],
-      esbuildOptions: {
-        // keep ESNext where possible, faster builds
-        target: 'es2019',
-      },
+      // `esbuildOptions` is deprecated for optimizeDeps; migration:
+      // Vite now uses Rollup for dependency optimization. If you previously
+      // tuned esbuild-specific options like `target`, keep build.target
+      // or migrate to appropriate Rollup settings. Leave an empty
+      // `rollupOptions` object here to avoid the deprecation warning and
+      // provide a spot for future rollup-based tweaks.
+      rollupOptions: {},
     },
   };
 });
