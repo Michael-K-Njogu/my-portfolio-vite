@@ -963,6 +963,135 @@ figcaption {
 
 }
 
+/* ---- Homepage: project item CTA link ---- */
+.project-item-cta {
+    display: inline-flex;
+    align-items: center;
+    color: var(--colour-accent-primary);
+    font-weight: 600;
+    font-size: 1rem;
+    margin-top: 20px;
+    text-decoration: none;
+    transition: color 0.2s ease, gap 0.2s ease;
+    gap: 4px;
+}
+
+.project-item-cta:hover {
+    color: var(--colour-accent-secondary);
+    gap: 8px;
+}
+
+/* ---- Case Study Detail: "More Case Studies" section ---- */
+.more-case-studies {
+    background-color: var(--bg-secondary);
+    border-top: 1px solid var(--colour-border);
+    padding: 80px 0;
+}
+
+.more-case-studies-title {
+    font-size: 2rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.more-case-studies-subtitle {
+    color: var(--text-muted);
+    margin-bottom: 40px;
+}
+
+.more-case-studies-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.more-case-studies-card {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--colour-border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.more-case-studies-card:hover {
+    box-shadow: 0 8px 24px rgba(var(--shadow-primary), 0.12);
+    transform: translateY(-4px);
+}
+
+.more-case-studies-card-link {
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    text-decoration: none;
+}
+
+.more-case-studies-card-img {
+    height: 180px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.more-case-studies-card-img img {
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.35s ease;
+    width: 100%;
+}
+
+.more-case-studies-card:hover .more-case-studies-card-img img {
+    transform: scale(1.04);
+}
+
+.more-case-studies-card-img-placeholder {
+    background-color: var(--bg-tertiary);
+    height: 100%;
+    width: 100%;
+}
+
+.more-case-studies-card-body {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    padding: 20px;
+}
+
+.more-case-studies-card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.more-case-studies-card-subtitle {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    flex-grow: 1;
+    margin-bottom: 16px;
+}
+
+.more-case-studies-card-cta {
+    align-items: center;
+    color: var(--colour-accent-primary);
+    display: inline-flex;
+    font-size: 0.9rem;
+    font-weight: 600;
+    gap: 4px;
+    margin-top: auto;
+    transition: gap 0.2s ease, color 0.2s ease;
+}
+
+.more-case-studies-card:hover .more-case-studies-card-cta {
+    color: var(--colour-accent-secondary);
+    gap: 8px;
+}
+
+@media (max-width: 1023.98px) {
+    .more-case-studies-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Footer styles */
 footer {
     background-color: var(--bg-secondary);
