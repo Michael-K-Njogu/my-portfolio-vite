@@ -1,7 +1,7 @@
 // src/pages/CaseStudyDetail.tsx
 import React, { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Person, People, Nut } from 'react-bootstrap-icons';
+import { useParams, Link } from 'react-router-dom';
+import { Person, People, Nut, ArrowRight } from 'react-bootstrap-icons';
 import { Container } from 'react-bootstrap';
 import ProjectNav from './ui/ProjectNav';
 import LoadingSpinner from './ui/LoadingSpinner';
@@ -69,6 +69,17 @@ type CaseStudyEntry = {
 
 const safeArray = <T,>(maybe?: T[] | null): T[] => (Array.isArray(maybe) ? maybe : []);
 
+const toAssetUrl = (maybeFile?: string | { fields?: { file?: ContentfulFile } } | ContentfulFile | null): string | null => {
+  if (!maybeFile) return null;
+  if (typeof maybeFile === 'string') {
+    return maybeFile.startsWith('//') ? `https:${maybeFile}` : maybeFile;
+  }
+  const file = (maybeFile as any).fields?.file ?? (maybeFile as any).file ?? (maybeFile as any);
+  const url = file?.url ?? null;
+  if (typeof url !== 'string') return null;
+  return url.startsWith('//') ? `https:${url}` : url;
+};
+
 /* ---------------------------
    Component
    --------------------------- */
@@ -82,6 +93,7 @@ const CaseStudyDetail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [headings, setHeadings] = useState<{ id: string; title: string }[]>([]);
   const [isDark, setIsDark] = useState<boolean>(false);
+  const [allCaseStudies, setAllCaseStudies] = useState<CaseStudyEntry[]>([]);
 
   // Framer Motion scroll progress hook
   const { scrollYProgress } = useScroll();
@@ -178,6 +190,32 @@ const CaseStudyDetail: React.FC = () => {
     };
   }, [slug]);
 
+  // Fetch all case studies for the "More Case Studies" section
+  useEffect(() => {
+    let mounted = true;
+    const usePreview = typeof window !== 'undefined' && window.location.search.includes('preview=true');
+    const client = selectClient(usePreview);
+
+    (async () => {
+      try {
+        const res = await client.getEntries?.({
+          content_type: 'caseStudy',
+          order: ['fields.order'],
+        });
+        if (!mounted) return;
+        if (res?.items && Array.isArray(res.items)) {
+          setAllCaseStudies(res.items as CaseStudyEntry[]);
+        }
+      } catch {
+        // silently fail — the "More Case Studies" section is non-critical
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   // Build headings for ProjectNav after content is rendered
   useEffect(() => {
     if (!loading && caseStudy) {
@@ -242,6 +280,11 @@ const CaseStudyDetail: React.FC = () => {
       </div>
     );
   }
+
+  // Compute other case studies for the "More Case Studies" section (exclude current)
+  const otherStudies = allCaseStudies
+    .filter((s) => s.fields?.slug !== slug && s.fields?.isFeatured)
+    .slice(0, 3);
 
   const {
     title,
@@ -633,6 +676,60 @@ const CaseStudyDetail: React.FC = () => {
             <Container>
               <h2>{takeawaysTitle ?? 'Takeaways'}</h2>
               {renderRichText(takeaways, 'takeaways')}
+            </Container>
+          </section>
+        )}
+
+        {otherStudies.length > 0 && (
+          <section className="more-case-studies">
+            <Container>
+              <h2 className="more-case-studies-title">More Case Studies</h2>
+              <p className="more-case-studies-subtitle">
+                Continue exploring my work — each project tells a different story.
+              </p>
+              <div className="more-case-studies-grid">
+                {otherStudies.map((study, index) => {
+                  const id = study.sys?.id ?? `study-${index}`;
+                  const f = study.fields ?? ({} as CaseStudyFields);
+                  const studyTitle = f.title ?? 'Untitled Project';
+                  const studySubtitle = f.subtitle ?? '';
+                  const studySlug = f.slug ?? studyTitle.toLowerCase().replace(/\s+/g, '-');
+                  const imgUrl = toAssetUrl(f.featuredImage?.fields?.file ?? f.featuredImage);
+
+                  return (
+                    <motion.div
+                      key={id}
+                      className="more-case-studies-card"
+                      initial={{ opacity: 0, y: 24 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+                      viewport={{ once: true }}
+                    >
+                      <Link to={`/case-studies/${studySlug}`} className="more-case-studies-card-link">
+                        <div className="more-case-studies-card-img">
+                          {imgUrl ? (
+                            <img src={imgUrl} alt={f.featuredImage?.fields?.title ?? studyTitle} />
+                          ) : (
+                            <div className="more-case-studies-card-img-placeholder" aria-hidden />
+                          )}
+                        </div>
+                        <div className="more-case-studies-card-body">
+                          <h3 className="more-case-studies-card-title">{studyTitle}</h3>
+                          {studySubtitle && (
+                            <p className="more-case-studies-card-subtitle">{studySubtitle}</p>
+                          )}
+                          <span className="more-case-studies-card-cta">
+                            View case study
+                            <span className="bootstrap-icon ms-1" aria-hidden="true">
+                              <ArrowRight size={16} />
+                            </span>
+                          </span>
+                        </div>
+                      </Link>
+                    </motion.div>
+                  );
+                })}
+              </div>
             </Container>
           </section>
         )}

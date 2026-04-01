@@ -7,7 +7,7 @@ import Hero from './ui/Hero';
 import LoadingSpinner from './ui/LoadingSpinner';
 import { selectClient } from '../contentfulClient';
 import { ContentfulLivePreview } from '@contentful/live-preview';
-import { Stars } from 'react-bootstrap-icons';
+import { Stars, ArrowRight } from 'react-bootstrap-icons';
 
 /* ----------------------
    Types
@@ -271,6 +271,17 @@ const CaseStudies: React.FC = () => {
                         ))}
                       </ul>
                     )}
+
+                    <Link
+                      to={`/case-studies/${slug}`}
+                      className="project-item-cta"
+                      aria-label={`View case study: ${title}`}
+                    >
+                      View case study
+                      <span className="bootstrap-icon ms-1" aria-hidden="true">
+                        <ArrowRight size={16} />
+                      </span>
+                    </Link>
                   </motion.div>
                 </div>
               </div>
