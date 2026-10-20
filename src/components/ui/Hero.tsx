@@ -29,9 +29,9 @@ const Hero = () => {
               transition={{ duration: 0.9, ease: [0.4, 0, 0.2, 1], delay: 0.3 }}
               className="hero-text"
             >
-              <h1 className="hero-title">I turn complex problems into clear, practical solutions.</h1>
+              <h1 className="hero-title">I design the experience. I build the product.</h1>
               <p className="mb-4">
-                Working at the intersection of product, delivery, and UX to bring structure, alignment, and execution to complex systems.
+                I'm a Product Design Engineer bridging UX, design systems, and frontend development to turn complex problems into usable digital products.
               </p>
 
               <div className="hero-buttons">
