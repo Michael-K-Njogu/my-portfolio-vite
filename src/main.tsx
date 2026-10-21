@@ -8,8 +8,6 @@ import CaseStudies from "./components/AllCaseStudies";
 import CaseStudyDetail from "./components/CaseStudyDetail";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
-import "@fontsource-variable/ibm-plex-sans";
-import "@fontsource/libre-caslon-text";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./styles/main.css";
 
@@ -44,12 +42,14 @@ const router = createBrowserRouter(
       v7_relativeSplatPath: true,
       v7_fetcherPersist: true,
     },
-  }
+  },
 );
 
 const root = document.getElementById("root") as HTMLElement | null;
 if (!root) {
-  throw new Error("Root element not found — make sure index.html contains <div id=\"root\"></div>");
+  throw new Error(
+    'Root element not found — make sure index.html contains <div id="root"></div>',
+  );
 }
 
 ReactDOM.createRoot(root).render(
@@ -63,5 +63,5 @@ ReactDOM.createRoot(root).render(
     >
       <RouterProvider router={router} />
     </ContentfulLivePreviewProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
