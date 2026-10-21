@@ -1,7 +1,7 @@
 /* Main CSS File */
 :root {
   /* Fonts */
-  --font-primary: 'IBM Plex Sans Variable', sans-serif;
+  --font-primary: "Google Sans", sans-serif;
   --font-secondary: 'Libre Caslon Text', serif;
 
   /* Background colours */
