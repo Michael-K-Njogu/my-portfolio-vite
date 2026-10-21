@@ -38,6 +38,7 @@ type CaseStudyFields = {
   slug?: string;
   isFeatured?: boolean;
   year?: number | string;
+  workInProgress?: boolean;
   featuredImage?: { fields?: ContentfulAssetFields };
   skills?: string[] | Array<{ sys?: ContentfulSys; fields?: any }>;
   [k: string]: any;
@@ -172,6 +173,7 @@ const CaseStudies: React.FC = () => {
       title,
       subtitle: fields.subtitle ?? "",
       year: fields.year,
+      workInProgress: fields.workInProgress === true,
       imageUrl: renderImageUrl(fields.featuredImage),
       imageAlt: fields.featuredImage?.fields?.title ?? "Project thumbnail",
       skills: resolveSkills(fields.skills),
@@ -334,10 +336,20 @@ const CaseStudies: React.FC = () => {
                       }}
                       viewport={{ once: true }}
                     >
-                      {fields.year && (
-                        <span className="project-year" {...(yearProps as any)}>
-                          {fields.year}
-                        </span>
+                      {(fields.year || fields.workInProgress) && (
+                        <div className="project-meta">
+                          {fields.year && (
+                            <span
+                              className="project-year"
+                              {...(yearProps as any)}
+                            >
+                              {fields.year}
+                            </span>
+                          )}
+                          {fields.workInProgress && (
+                            <span className="wip-badge">Work in progress</span>
+                          )}
+                        </div>
                       )}
                       <h3 {...(titleProps as any)}>
                         <Link to={`/case-studies/${slug}`}>{title}</Link>
