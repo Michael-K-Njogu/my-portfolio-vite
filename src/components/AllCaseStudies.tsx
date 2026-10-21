@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import Hero from "./ui/Hero";
 import ExperienceHighlights from "./ui/ExperienceHighlights";
+import CaseStudyGrid from "./ui/CaseStudyGrid";
 import LoadingSpinner from "./ui/LoadingSpinner";
 import { selectClient } from "../contentfulClient";
 import { ContentfulLivePreview } from "@contentful/live-preview";
@@ -156,6 +157,27 @@ const CaseStudies: React.FC = () => {
     return url ?? undefined;
   };
 
+  // New card layout is the default; add ?layout=list to view the original list layout
+  const useGridLayout =
+    typeof window === "undefined" ||
+    !window.location.search.includes("layout=list");
+
+  const gridItems = filteredStudies.map((item) => {
+    const fields = item.fields ?? ({} as CaseStudyFields);
+    const id = item.sys?.id ?? "";
+    const title = fields.title ?? "Untitled project";
+    return {
+      id,
+      slug: fields.slug ?? title.toLowerCase().replace(/\s+/g, "-"),
+      title,
+      subtitle: fields.subtitle ?? "",
+      year: fields.year,
+      imageUrl: renderImageUrl(fields.featuredImage),
+      imageAlt: fields.featuredImage?.fields?.title ?? "Project thumbnail",
+      skills: resolveSkills(fields.skills),
+    };
+  });
+
   return (
     <div className="wrapper">
       <Hero />
@@ -186,12 +208,12 @@ const CaseStudies: React.FC = () => {
               className={`project-tab ${filter === "other" ? "active" : ""}`}
               aria-selected={filter === "other"}
             >
-              Other Work
+              Notable Mentions
             </button>
           </div>
 
           <h2 className="section-title mb-3">
-            {filter === "featured" ? "Featured Case Work" : "Other Work"}
+            {filter === "featured" ? "Featured Work" : "Notable Mentions"}
           </h2>
 
           <p className="mb-4 mb-md-5">
@@ -216,122 +238,126 @@ const CaseStudies: React.FC = () => {
             <p>No projects found.</p>
           )}
 
-          {filteredStudies.map((item) => {
-            const id =
-              item.sys?.id ?? `case-${Math.random().toString(36).slice(2, 9)}`;
-            const fields = item.fields ?? ({} as CaseStudyFields);
-            const title = fields.title ?? "Untitled project";
-            const subtitle = fields.subtitle ?? "";
-            const slug =
-              fields.slug ??
-              (typeof title === "string"
-                ? title.toLowerCase().replace(/\s+/g, "-")
-                : id);
-            const imageUrl = renderImageUrl(fields.featuredImage);
-            const skills = resolveSkills(fields.skills);
+          {useGridLayout && <CaseStudyGrid items={gridItems} />}
 
-            // Contentful Live Preview props (safe-guarded)
-            const titleProps =
-              typeof ContentfulLivePreview?.getProps === "function"
-                ? ContentfulLivePreview.getProps({
-                    entryId: item.sys.id,
-                    fieldId: "title",
-                  })
-                : {};
-            const subtitleProps =
-              typeof ContentfulLivePreview?.getProps === "function"
-                ? ContentfulLivePreview.getProps({
-                    entryId: item.sys.id,
-                    fieldId: "subtitle",
-                  })
-                : {};
-            const yearProps =
-              typeof ContentfulLivePreview?.getProps === "function"
-                ? ContentfulLivePreview.getProps({
-                    entryId: item.sys.id,
-                    fieldId: "year",
-                  })
-                : {};
+          {!useGridLayout &&
+            filteredStudies.map((item) => {
+              const id =
+                item.sys?.id ??
+                `case-${Math.random().toString(36).slice(2, 9)}`;
+              const fields = item.fields ?? ({} as CaseStudyFields);
+              const title = fields.title ?? "Untitled project";
+              const subtitle = fields.subtitle ?? "";
+              const slug =
+                fields.slug ??
+                (typeof title === "string"
+                  ? title.toLowerCase().replace(/\s+/g, "-")
+                  : id);
+              const imageUrl = renderImageUrl(fields.featuredImage);
+              const skills = resolveSkills(fields.skills);
 
-            return (
-              <div
-                key={id}
-                className="project-item align-items-center mb-5 d-flex flex-column flex-md-row"
-              >
-                {/* Project Image */}
-                <div className="project-item-img me-md-4 mb-md-0">
-                  <motion.div
-                    initial={{ opacity: 0, x: -50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
-                    viewport={{ once: true }}
-                  >
-                    <Link to={`/case-studies/${slug}`}>
-                      {imageUrl ? (
-                        <img
-                          fetchPriority="high"
-                          src={imageUrl}
-                          alt={
-                            fields.featuredImage?.fields?.title ??
-                            "Project thumbnail"
-                          }
-                          className="img-fluid shadow-sm"
-                        />
-                      ) : (
-                        <div
-                          style={{
-                            width: 320,
-                            height: 180,
-                            background: "#f3f3f3",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                          aria-hidden
-                        >
-                          <span className="text-muted">No image</span>
-                        </div>
+              // Contentful Live Preview props (safe-guarded)
+              const titleProps =
+                typeof ContentfulLivePreview?.getProps === "function"
+                  ? ContentfulLivePreview.getProps({
+                      entryId: item.sys.id,
+                      fieldId: "title",
+                    })
+                  : {};
+              const subtitleProps =
+                typeof ContentfulLivePreview?.getProps === "function"
+                  ? ContentfulLivePreview.getProps({
+                      entryId: item.sys.id,
+                      fieldId: "subtitle",
+                    })
+                  : {};
+              const yearProps =
+                typeof ContentfulLivePreview?.getProps === "function"
+                  ? ContentfulLivePreview.getProps({
+                      entryId: item.sys.id,
+                      fieldId: "year",
+                    })
+                  : {};
+
+              return (
+                <div
+                  key={id}
+                  className="project-item align-items-center mb-5 d-flex flex-column flex-md-row"
+                >
+                  {/* Project Image */}
+                  <div className="project-item-img me-md-4 mb-md-0">
+                    <motion.div
+                      initial={{ opacity: 0, x: -50 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+                      viewport={{ once: true }}
+                    >
+                      <Link to={`/case-studies/${slug}`}>
+                        {imageUrl ? (
+                          <img
+                            fetchPriority="high"
+                            src={imageUrl}
+                            alt={
+                              fields.featuredImage?.fields?.title ??
+                              "Project thumbnail"
+                            }
+                            className="img-fluid shadow-sm"
+                          />
+                        ) : (
+                          <div
+                            style={{
+                              width: 320,
+                              height: 180,
+                              background: "#f3f3f3",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                            aria-hidden
+                          >
+                            <span className="text-muted">No image</span>
+                          </div>
+                        )}
+                      </Link>
+                    </motion.div>
+                  </div>
+
+                  {/* Project Info */}
+                  <div className="project-item-info">
+                    <motion.div
+                      initial={{ opacity: 0, x: 50 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{
+                        duration: 0.8,
+                        ease: [0.4, 0, 0.2, 1],
+                        delay: 0.1,
+                      }}
+                      viewport={{ once: true }}
+                    >
+                      {fields.year && (
+                        <span className="project-year" {...(yearProps as any)}>
+                          {fields.year}
+                        </span>
                       )}
-                    </Link>
-                  </motion.div>
-                </div>
+                      <h3 {...(titleProps as any)}>
+                        <Link to={`/case-studies/${slug}`}>{title}</Link>
+                      </h3>
+                      <p {...(subtitleProps as any)}>{subtitle}</p>
 
-                {/* Project Info */}
-                <div className="project-item-info">
-                  <motion.div
-                    initial={{ opacity: 0, x: 50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{
-                      duration: 0.8,
-                      ease: [0.4, 0, 0.2, 1],
-                      delay: 0.1,
-                    }}
-                    viewport={{ once: true }}
-                  >
-                    {fields.year && (
-                      <span className="project-year" {...(yearProps as any)}>
-                        {fields.year}
-                      </span>
-                    )}
-                    <h3 {...(titleProps as any)}>
-                      <Link to={`/case-studies/${slug}`}>{title}</Link>
-                    </h3>
-                    <p {...(subtitleProps as any)}>{subtitle}</p>
-
-                    {skills.length > 0 && (
-                      <ul className="categories">
-                        {skills.map((skill, i) => (
-                          <li key={i}>
-                            <span>{skill}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </motion.div>
+                      {skills.length > 0 && (
+                        <ul className="categories">
+                          {skills.map((skill, i) => (
+                            <li key={i}>
+                              <span>{skill}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </motion.div>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
         </Container>
       </section>
     </div>
