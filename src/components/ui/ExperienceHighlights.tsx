@@ -10,7 +10,7 @@ const highlights = [
   },
   {
     value: "UX + UI",
-    label: "Research through interaction",
+    label: "Research and visual design",
     Icon: PenTool,
   },
   {
