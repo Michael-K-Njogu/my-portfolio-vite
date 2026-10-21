@@ -33,8 +33,6 @@ const NotFound: React.FC = () => {
           <Link
             className="styled-link styled-link-full"
             to="/"
-            title="Go back to the homepage"
-            aria-label="Go back to the homepage"
           >
             Take me back home
           </Link>
