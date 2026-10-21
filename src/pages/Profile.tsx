@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Container, Row, Col, Button, Spinner } from "react-bootstrap";
 import { motion, Variants } from "framer-motion";
 import Avatar from "../images/michael-njogu-profile.jpeg";
-import { BoxArrowUpRight, ArrowUpRight } from "react-bootstrap-icons";
+import { SquareArrowOutUpRight, ArrowUpRight } from "lucide-react";
 import Timeline from "../components/ui/Timeline";
 import LoadingSpinner from "../components/ui/LoadingSpinner";
 import { selectClient } from "../contentfulClient";
@@ -588,7 +588,7 @@ const About: React.FC = () => {
                         >
                           View credential
                           <span className="bootstrap-icon">
-                            <BoxArrowUpRight size={16} className="ms-2" />
+                            <SquareArrowOutUpRight size={16} className="ms-2" />
                           </span>
                         </a>
                       ) : (
