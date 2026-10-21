@@ -1,10 +1,13 @@
 // src/components/layout/Footer.tsx
-import React from "react";
+import React, { useState } from "react";
 import { Row, Col, Container } from "react-bootstrap";
+import AboutPortfolioModal from "../ui/AboutPortfolioModal";
 
 const currentYear: number = new Date().getFullYear();
 
 const Footer: React.FC = () => {
+  const [showAbout, setShowAbout] = useState(false);
+
   return (
     <footer>
       <Container>
@@ -12,9 +15,14 @@ const Footer: React.FC = () => {
           <Col md={8}>
             <p>
               &copy; {currentYear} Michael Njogu. &nbsp;
-              <a href="#" rel="nofollow noreferrer">
+              <button
+                type="button"
+                className="footer-link-button"
+                onClick={() => setShowAbout(true)}
+                aria-haspopup="dialog"
+              >
                 About this portfolio
-              </a>
+              </button>
             </p>
           </Col>
 
@@ -33,25 +41,6 @@ const Footer: React.FC = () => {
 
               <li>
                 <a
-                  href="#email"
-                  onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
-                    e.preventDefault();
-                    const codes = [
-                      109, 121, 107, 101, 107, 117, 110, 121, 111, 64, 103, 109,
-                      97, 105, 108, 46, 99, 111, 109,
-                    ];
-                    const email = String.fromCharCode(...codes);
-                    window.location.href = `mailto:${email}`;
-                  }}
-                  title="Send me an email"
-                  aria-label="Send me an email"
-                >
-                  Email
-                </a>
-              </li>
-
-              <li>
-                <a
                   href="https://github.com/Michael-K-Njogu"
                   rel="nofollow noreferrer"
                   target="_blank"
@@ -64,6 +53,11 @@ const Footer: React.FC = () => {
           </Col>
         </Row>
       </Container>
+
+      <AboutPortfolioModal
+        show={showAbout}
+        onHide={() => setShowAbout(false)}
+      />
     </footer>
   );
 };
