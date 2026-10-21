@@ -1,21 +1,27 @@
 // src/pages/CaseStudyDetail.tsx
-import React, { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { User, Users, Nut } from 'lucide-react';
-import { Container } from 'react-bootstrap';
-import ProjectNav from './ui/ProjectNav';
-import LoadingSpinner from './ui/LoadingSpinner';
-import { motion, useScroll, useSpring } from 'framer-motion';
-import Zoom from 'react-medium-image-zoom';
-import 'react-medium-image-zoom/dist/styles.css';
+import React, { useEffect, useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
+import { User, Users, Nut } from "lucide-react";
+import { Container } from "react-bootstrap";
+import ProjectNav from "./ui/ProjectNav";
+import LoadingSpinner from "./ui/LoadingSpinner";
+import { motion, useScroll, useSpring } from "framer-motion";
+import Zoom from "react-medium-image-zoom";
+import "react-medium-image-zoom/dist/styles.css";
 
 /* Contentful */
-import { selectClient } from '../contentfulClient';
-import { documentToReactComponents, Options as RichTextOptions } from '@contentful/rich-text-react-renderer';
-import { BLOCKS, INLINES } from '@contentful/rich-text-types';
-import { ContentfulLivePreview } from '@contentful/live-preview';
-import { ContentfulLivePreviewProvider, useContentfulLiveUpdates } from '@contentful/live-preview/react';
-import type { Document } from '@contentful/rich-text-types';
+import { selectClient } from "../contentfulClient";
+import {
+  documentToReactComponents,
+  Options as RichTextOptions,
+} from "@contentful/rich-text-react-renderer";
+import { BLOCKS, INLINES } from "@contentful/rich-text-types";
+import { ContentfulLivePreview } from "@contentful/live-preview";
+import {
+  ContentfulLivePreviewProvider,
+  useContentfulLiveUpdates,
+} from "@contentful/live-preview/react";
+import type { Document } from "@contentful/rich-text-types";
 
 /* ---------------------------
    Types
@@ -67,7 +73,8 @@ type CaseStudyEntry = {
    Utilities
    --------------------------- */
 
-const safeArray = <T,>(maybe?: T[] | null): T[] => (Array.isArray(maybe) ? maybe : []);
+const safeArray = <T,>(maybe?: T[] | null): T[] =>
+  Array.isArray(maybe) ? maybe : [];
 
 /* ---------------------------
    Component
@@ -77,7 +84,9 @@ const CaseStudyDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const [caseStudy, setCaseStudy] = useState<CaseStudyEntry | null>(null);
   // liveEntry will be null in environments where live updates are not enabled; typings are loose here
-  const liveEntry = useContentfulLiveUpdates(caseStudy as any) as CaseStudyEntry | null;
+  const liveEntry = useContentfulLiveUpdates(
+    caseStudy as any,
+  ) as CaseStudyEntry | null;
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [headings, setHeadings] = useState<{ id: string; title: string }[]>([]);
@@ -94,7 +103,10 @@ const CaseStudyDetail: React.FC = () => {
   // Read theme once (safe guard for SSR)
   useEffect(() => {
     try {
-      setIsDark(typeof document !== 'undefined' && document.body.classList.contains('theme-dark'));
+      setIsDark(
+        typeof document !== "undefined" &&
+          document.body.classList.contains("theme-dark"),
+      );
     } catch {
       setIsDark(false);
     }
@@ -105,18 +117,18 @@ const CaseStudyDetail: React.FC = () => {
     if (caseStudy?.fields?.title) {
       document.title = `${caseStudy.fields.title} – Michael Njogu`;
     } else {
-      document.title = 'Michael Njogu - Strategic Product Designer';
+      document.title = "Michael Njogu - Strategic Product Designer";
     }
 
     return () => {
-      document.title = 'Michael Njogu – Strategic Product Designer';
+      document.title = "Michael Njogu – Strategic Product Designer";
     };
   }, [caseStudy]);
 
   // Reset scroll & progress when slug changes
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     // try to nudge scrollYProgress back toward 0 safely if available
@@ -143,14 +155,16 @@ const CaseStudyDetail: React.FC = () => {
     setError(null);
 
     // safe preview detection
-    const usePreview = typeof window !== 'undefined' && window.location.search.includes('preview=true');
+    const usePreview =
+      typeof window !== "undefined" &&
+      window.location.search.includes("preview=true");
     const client = selectClient(usePreview);
 
     (async () => {
       try {
         const res = await client.getEntries?.({
-          content_type: 'caseStudy',
-          'fields.slug': slug,
+          content_type: "caseStudy",
+          "fields.slug": slug,
           include: 10,
         });
 
@@ -159,14 +173,14 @@ const CaseStudyDetail: React.FC = () => {
         const item = res?.items?.[0] as CaseStudyEntry | undefined;
 
         if (!item) {
-          setError('Case study not found');
+          setError("Case study not found");
           setCaseStudy(null);
         } else {
           setCaseStudy(item);
         }
       } catch (err: any) {
-        console.error('Contentful fetch error:', err);
-        setError(err?.message ?? 'Failed to load case study');
+        console.error("Contentful fetch error:", err);
+        setError(err?.message ?? "Failed to load case study");
         setCaseStudy(null);
       } finally {
         if (mounted) setLoading(false);
@@ -183,11 +197,18 @@ const CaseStudyDetail: React.FC = () => {
     if (!loading && caseStudy) {
       try {
         // Find all h2 within .project-section
-        const sectionHeadings = Array.from(document.querySelectorAll('.project-section h2')) as HTMLHeadingElement[];
+        const sectionHeadings = Array.from(
+          document.querySelectorAll(".project-section h2"),
+        ) as HTMLHeadingElement[];
         const newHeadings = sectionHeadings.map((el) => {
-          const text = el.textContent?.trim() ?? '';
-          const id = el.id || text.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
-          return { id, title: text || 'Section' };
+          const text = el.textContent?.trim() ?? "";
+          const id =
+            el.id ||
+            text
+              .toLowerCase()
+              .replace(/\s+/g, "-")
+              .replace(/[^\w-]/g, "");
+          return { id, title: text || "Section" };
         });
 
         // Ensure headings have unique IDs
@@ -206,15 +227,15 @@ const CaseStudyDetail: React.FC = () => {
   if (loading) {
     return (
       <div className="wrapper">
-        <LoadingSpinner 
+        <LoadingSpinner
           messages={[
-            "Summoning the design magic...", 
-            "Loading the case study canvas...", 
+            "Summoning the design magic...",
+            "Loading the case study canvas...",
             "Preparing an exceptional UX experience...",
             "Taming the UX unicorn...please hold.",
             "Warming up the problem-solving engine...",
-          ]} 
-          minHeight="100vh" 
+          ]}
+          minHeight="100vh"
         />
       </div>
     );
@@ -264,13 +285,18 @@ const CaseStudyDetail: React.FC = () => {
   } = entry.fields ?? ({} as CaseStudyFields);
 
   // Render options for Contentful Rich Text (stable function)
-  const createRenderOptions = (entryId?: string, fieldId?: string): RichTextOptions => {
+  const createRenderOptions = (
+    entryId?: string,
+    fieldId?: string,
+  ): RichTextOptions => {
     return {
       renderNode: {
         [BLOCKS.HEADING_2]: (_node, children) => (
           <h2
             className="text-2xl font-semibold mt-6 mb-4"
-            {...(typeof ContentfulLivePreview?.getProps === 'function' && entryId && fieldId
+            {...(typeof ContentfulLivePreview?.getProps === "function" &&
+            entryId &&
+            fieldId
               ? ContentfulLivePreview.getProps({ entryId, fieldId })
               : {})}
           >
@@ -281,7 +307,9 @@ const CaseStudyDetail: React.FC = () => {
         [BLOCKS.HEADING_3]: (_node, children) => (
           <h3
             className="mb-3"
-            {...(typeof ContentfulLivePreview?.getProps === 'function' && entryId && fieldId
+            {...(typeof ContentfulLivePreview?.getProps === "function" &&
+            entryId &&
+            fieldId
               ? ContentfulLivePreview.getProps({ entryId, fieldId })
               : {})}
           >
@@ -292,7 +320,9 @@ const CaseStudyDetail: React.FC = () => {
         [BLOCKS.HEADING_4]: (_node, children) => (
           <h4
             className="mb-3"
-            {...(typeof ContentfulLivePreview?.getProps === 'function' && entryId && fieldId
+            {...(typeof ContentfulLivePreview?.getProps === "function" &&
+            entryId &&
+            fieldId
               ? ContentfulLivePreview.getProps({ entryId, fieldId })
               : {})}
           >
@@ -302,8 +332,13 @@ const CaseStudyDetail: React.FC = () => {
 
         [BLOCKS.PARAGRAPH]: (_node, children) => (
           <p
-            {...(typeof ContentfulLivePreview?.getProps === 'function' && entry.sys?.id && 'overview'
-              ? ContentfulLivePreview.getProps({ entryId: entry.sys.id, fieldId: 'overview' })
+            {...(typeof ContentfulLivePreview?.getProps === "function" &&
+            entry.sys?.id &&
+            "overview"
+              ? ContentfulLivePreview.getProps({
+                  entryId: entry.sys.id,
+                  fieldId: "overview",
+                })
               : {})}
           >
             {children}
@@ -321,8 +356,12 @@ const CaseStudyDetail: React.FC = () => {
         [BLOCKS.TABLE_HEADER_CELL]: (_node, children) => <th>{children}</th>,
         [BLOCKS.TABLE_CELL]: (_node, children) => (
           <td
-            {...(typeof ContentfulLivePreview?.getProps === 'function' && entry.sys?.id
-              ? ContentfulLivePreview.getProps({ entryId: entry.sys.id, fieldId: fieldId ?? '' })
+            {...(typeof ContentfulLivePreview?.getProps === "function" &&
+            entry.sys?.id
+              ? ContentfulLivePreview.getProps({
+                  entryId: entry.sys.id,
+                  fieldId: fieldId ?? "",
+                })
               : {})}
           >
             {children}
@@ -332,8 +371,12 @@ const CaseStudyDetail: React.FC = () => {
         [BLOCKS.UL_LIST]: (_node, children) => (
           <ul
             className="custom-unordered-list"
-            {...(typeof ContentfulLivePreview?.getProps === 'function' && entry.sys?.id
-              ? ContentfulLivePreview.getProps({ entryId: entry.sys.id, fieldId: fieldId ?? '' })
+            {...(typeof ContentfulLivePreview?.getProps === "function" &&
+            entry.sys?.id
+              ? ContentfulLivePreview.getProps({
+                  entryId: entry.sys.id,
+                  fieldId: fieldId ?? "",
+                })
               : {})}
           >
             {children}
@@ -346,18 +389,32 @@ const CaseStudyDetail: React.FC = () => {
             ? node.content.map((childNode, i) =>
                 documentToReactComponents(childNode as any, {
                   renderNode: {
-                    [BLOCKS.PARAGRAPH]: (_n, children) => <span key={`p-${i}`}>{children}</span>,
-                    [BLOCKS.UL_LIST]: (_n, children) => <ul key={`ul-${i}`} className="nested-list">{children}</ul>,
-                    [BLOCKS.OL_LIST]: (_n, children) => <ol key={`ol-${i}`} className="nested-list">{children}</ol>,
+                    [BLOCKS.PARAGRAPH]: (_n, children) => (
+                      <span key={`p-${i}`}>{children}</span>
+                    ),
+                    [BLOCKS.UL_LIST]: (_n, children) => (
+                      <ul key={`ul-${i}`} className="nested-list">
+                        {children}
+                      </ul>
+                    ),
+                    [BLOCKS.OL_LIST]: (_n, children) => (
+                      <ol key={`ol-${i}`} className="nested-list">
+                        {children}
+                      </ol>
+                    ),
                   },
-                })
+                }),
               )
             : null;
 
           return (
             <li
-              {...(typeof ContentfulLivePreview?.getProps === 'function' && entry.sys?.id
-                ? ContentfulLivePreview.getProps({ entryId: entry.sys.id, fieldId: fieldId ?? '' })
+              {...(typeof ContentfulLivePreview?.getProps === "function" &&
+              entry.sys?.id
+                ? ContentfulLivePreview.getProps({
+                    entryId: entry.sys.id,
+                    fieldId: fieldId ?? "",
+                  })
                 : {})}
               className="custom-list-item"
             >
@@ -367,12 +424,19 @@ const CaseStudyDetail: React.FC = () => {
         },
 
         [INLINES.HYPERLINK]: (node, children) => (
-          <a href={(node as any).data?.uri} className="text-blue-600 underline hover:text-blue-800" target="_blank" rel="noopener noreferrer">
+          <a
+            href={(node as any).data?.uri}
+            className="text-blue-600 underline hover:text-blue-800"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             {children}
           </a>
         ),
 
-        [BLOCKS.QUOTE]: (_node, children) => <blockquote className="custom-blockquote">{children}</blockquote>,
+        [BLOCKS.QUOTE]: (_node, children) => (
+          <blockquote className="custom-blockquote">{children}</blockquote>
+        ),
 
         [BLOCKS.EMBEDDED_ASSET]: (node) => {
           const target = (node as any)?.data?.target;
@@ -381,7 +445,11 @@ const CaseStudyDetail: React.FC = () => {
           const title = fields?.title;
           const description = fields?.description;
           const rawUrl = fileField?.url;
-          const imageUrl = rawUrl ? (rawUrl.startsWith('//') ? `https:${rawUrl}` : rawUrl) : null;
+          const imageUrl = rawUrl
+            ? rawUrl.startsWith("//")
+              ? `https:${rawUrl}`
+              : rawUrl
+            : null;
 
           if (!imageUrl) {
             return (
@@ -404,16 +472,22 @@ const CaseStudyDetail: React.FC = () => {
                 {/* Live preview props if available */}
                 <img
                   fetchPriority="high"
-                  {...(typeof ContentfulLivePreview?.getProps === 'function' && entry.sys?.id
-                    ? ContentfulLivePreview.getProps({ entryId: entry.sys.id, fieldId: fieldId ?? '' })
+                  {...(typeof ContentfulLivePreview?.getProps === "function" &&
+                  entry.sys?.id
+                    ? ContentfulLivePreview.getProps({
+                        entryId: entry.sys.id,
+                        fieldId: fieldId ?? "",
+                      })
                     : {})}
                   src={imageUrl}
-                  alt={description || title || ''}
+                  alt={description || title || ""}
                   className="gallery-img w-full max-h-[500px] object-cover"
                 />
               </Zoom>
               {(title || description) && (
-                <figcaption className="text-sm text-gray-500 mt-2 text-center">{description || title}</figcaption>
+                <figcaption className="text-sm text-gray-500 mt-2 text-center">
+                  {description || title}
+                </figcaption>
               )}
             </figure>
           );
@@ -426,7 +500,7 @@ const CaseStudyDetail: React.FC = () => {
           const fields = embedded.fields || {};
 
           // Image gallery block
-          if (contentType === 'imageGallery') {
+          if (contentType === "imageGallery") {
             const { images = [], showCaptions } = fields as any;
             return (
               <section className="mt-10">
@@ -434,17 +508,31 @@ const CaseStudyDetail: React.FC = () => {
                   {Array.isArray(images) &&
                     images.map((asset: any, i: number) => {
                       const file = asset?.fields?.file;
-                      const fileUrl = file?.url ? (file.url.startsWith('//') ? `https:${file.url}` : file.url) : null;
+                      const fileUrl = file?.url
+                        ? file.url.startsWith("//")
+                          ? `https:${file.url}`
+                          : file.url
+                        : null;
                       const title = asset?.fields?.title;
                       const description = asset?.fields?.description;
                       return (
-                        <div key={i} className="rounded-xl overflow-hidden shadow-md">
+                        <div
+                          key={i}
+                          className="rounded-xl overflow-hidden shadow-md"
+                        >
                           <figure className="mb-0 mt-0">
                             <Zoom>
-                                {fileUrl ? (
-                                <img fetchPriority="high" src={fileUrl} alt={title || `Gallery image ${i + 1}`} className="gallery-img h-64 object-cover hover:scale-105 transition-transform duration-300" />
+                              {fileUrl ? (
+                                <img
+                                  fetchPriority="high"
+                                  src={fileUrl}
+                                  alt={title || `Gallery image ${i + 1}`}
+                                  className="gallery-img h-64 object-cover hover:scale-105 transition-transform duration-300"
+                                />
                               ) : (
-                                <div className="gallery-img h-64 flex items-center justify-center bg-gray-100 text-gray-500">Asset processing…</div>
+                                <div className="gallery-img h-64 flex items-center justify-center bg-gray-100 text-gray-500">
+                                  Asset processing…
+                                </div>
                               )}
                             </Zoom>
 
@@ -463,7 +551,11 @@ const CaseStudyDetail: React.FC = () => {
           }
 
           // fallback for unknown embedded entry types
-          return <div className="bg-gray-100 p-4 rounded text-sm text-gray-600">Unknown embedded entry type</div>;
+          return (
+            <div className="bg-gray-100 p-4 rounded text-sm text-gray-600">
+              Unknown embedded entry type
+            </div>
+          );
         },
 
         [INLINES.EMBEDDED_ENTRY]: (node) => {
@@ -472,24 +564,40 @@ const CaseStudyDetail: React.FC = () => {
           const contentType = embedded.sys?.contentType?.sys?.id;
           const fields = embedded.fields || {};
 
-          if (contentType === 'imageGallery') {
+          if (contentType === "imageGallery") {
             const title = fields?.title;
             const media = fields?.media ?? [];
             const urls = Array.isArray(media)
-              ? media.map((m: any) => {
-                  const file = m?.fields?.file;
-                  return file?.url ? (file.url.startsWith('//') ? `https:${file.url}` : file.url) : null;
-                }).filter(Boolean)
+              ? media
+                  .map((m: any) => {
+                    const file = m?.fields?.file;
+                    return file?.url
+                      ? file.url.startsWith("//")
+                        ? `https:${file.url}`
+                        : file.url
+                      : null;
+                  })
+                  .filter(Boolean)
               : [];
 
             if (!urls.length) return null;
 
             return (
               <span className="inline-block align-middle ml-2 mr-2">
-                {title && <span className="block text-xs text-gray-500 mb-1">{title}</span>}
+                {title && (
+                  <span className="block text-xs text-gray-500 mb-1">
+                    {title}
+                  </span>
+                )}
                 <div className="inline-flex gap-2">
                   {urls.map((u: string, i: number) => (
-                    <img key={i} fetchPriority="high" src={u} alt={title || `Gallery thumbnail ${i + 1}`} className="w-16 h-16 object-cover rounded" />
+                    <img
+                      key={i}
+                      fetchPriority="high"
+                      src={u}
+                      alt={title || `Gallery thumbnail ${i + 1}`}
+                      className="w-16 h-16 object-cover rounded"
+                    />
                   ))}
                 </div>
               </span>
@@ -505,7 +613,10 @@ const CaseStudyDetail: React.FC = () => {
   // Render rich text sections using our render options
   const renderRichText = (doc?: Document | null, fieldId?: string) => {
     if (!doc) return null;
-    return documentToReactComponents(doc, createRenderOptions(entry.sys?.id, fieldId));
+    return documentToReactComponents(
+      doc,
+      createRenderOptions(entry.sys?.id, fieldId),
+    );
   };
 
   const safeRole = safeArray(role);
@@ -513,15 +624,19 @@ const CaseStudyDetail: React.FC = () => {
   const safeSkills = safeArray(skills);
 
   return (
-    <ContentfulLivePreviewProvider locale="en-US" enableInspectorMode enableLiveUpdates>
+    <ContentfulLivePreviewProvider
+      locale="en-US"
+      enableInspectorMode
+      enableLiveUpdates
+    >
       <div className="wrapper">
         <motion.div
           className="scroll-progress"
-          style={{ scaleX, background: isDark ? '#60a5fa' : '#1e3a8a' }}
+          style={{ scaleX, background: isDark ? "#60a5fa" : "#1e3a8a" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
         />
 
         <div className="project-header">
@@ -530,24 +645,29 @@ const CaseStudyDetail: React.FC = () => {
             <p className="project-subtitle">{subtitle}</p>
             {hasNda && (
               <div className="disclaimer">
-                To comply with my Non-Disclosure Agreement (NDA) with {organization}, I have omitted certain details in this case study.
+                To comply with my Non-Disclosure Agreement (NDA) with{" "}
+                {organization}, I have omitted certain details in this case
+                study.
               </div>
             )}
           </Container>
         </div>
 
-        <ProjectNav previousPageName="All Projects" links={headings.map((h) => h.title)} />
+        <ProjectNav
+          previousPageName="All Work"
+          links={headings.map((h) => h.title)}
+        />
 
         <section className="project-section-small bg-tertiary">
           <Container>
             <div className="project-overview">
               <div className="project-overview-card">
-                <h5>
+                <h2>
                   <span className="bootstrap-icon">
                     <User size={24} />
-                  </span>{' '}
+                  </span>{" "}
                   My Role
-                </h5>
+                </h2>
                 <ul>
                   {safeRole.map((item, i) => (
                     <li key={i}>
@@ -558,12 +678,12 @@ const CaseStudyDetail: React.FC = () => {
               </div>
 
               <div className="project-overview-card">
-                <h5>
+                <h2>
                   <span className="bootstrap-icon">
                     <Users size={24} />
-                  </span>{' '}
+                  </span>{" "}
                   Team Composition
-                </h5>
+                </h2>
                 <ul>
                   {safeTeam.map((member, i) => (
                     <li key={i}>
@@ -574,12 +694,12 @@ const CaseStudyDetail: React.FC = () => {
               </div>
 
               <div className="project-overview-card">
-                <h5>
+                <h2>
                   <span className="bootstrap-icon">
                     <Nut size={24} />
-                  </span>{' '}
+                  </span>{" "}
                   Skills &amp; Tools
-                </h5>
+                </h2>
                 <ul>
                   {safeSkills.map((skill, i) => (
                     <li key={i}>
@@ -595,8 +715,8 @@ const CaseStudyDetail: React.FC = () => {
         {overview && (
           <section className="project-section">
             <Container>
-              <h2>{overviewTitle ?? 'Overview'}</h2>
-              {renderRichText(overview, 'overview')}
+              <h2>{overviewTitle ?? "Overview"}</h2>
+              {renderRichText(overview, "overview")}
             </Container>
           </section>
         )}
@@ -604,8 +724,8 @@ const CaseStudyDetail: React.FC = () => {
         {context && (
           <section className="project-section bg-secondary">
             <Container>
-              <h2>{contextTitle ?? 'Context'}</h2>
-              {renderRichText(context, 'context')}
+              <h2>{contextTitle ?? "Context"}</h2>
+              {renderRichText(context, "context")}
             </Container>
           </section>
         )}
@@ -613,8 +733,8 @@ const CaseStudyDetail: React.FC = () => {
         {designProcess && (
           <section className="project-section">
             <Container>
-              <h2>{processTitle ?? 'Process'}</h2>
-              {renderRichText(designProcess, 'designProcess')}
+              <h2>{processTitle ?? "Process"}</h2>
+              {renderRichText(designProcess, "designProcess")}
             </Container>
           </section>
         )}
@@ -622,8 +742,8 @@ const CaseStudyDetail: React.FC = () => {
         {results && (
           <section className="project-section bg-secondary">
             <Container>
-              <h2>{resultsTitle ?? 'Results'}</h2>
-              {renderRichText(results, 'results')}
+              <h2>{resultsTitle ?? "Results"}</h2>
+              {renderRichText(results, "results")}
             </Container>
           </section>
         )}
@@ -631,8 +751,8 @@ const CaseStudyDetail: React.FC = () => {
         {takeaways && (
           <section className="project-section">
             <Container>
-              <h2>{takeawaysTitle ?? 'Takeaways'}</h2>
-              {renderRichText(takeaways, 'takeaways')}
+              <h2>{takeawaysTitle ?? "Takeaways"}</h2>
+              {renderRichText(takeaways, "takeaways")}
             </Container>
           </section>
         )}
