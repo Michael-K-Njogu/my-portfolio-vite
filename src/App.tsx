@@ -55,7 +55,9 @@ const App: React.FC = () => {
     <>
       <Header />
       <ScrollToTop />
-      <Outlet /> {/* ← Nested routes render here */}
+      <main id="main-content">
+        <Outlet /> {/* ← Nested routes render here */}
+      </main>
       <BackToTop />
       <Footer />
     </>
