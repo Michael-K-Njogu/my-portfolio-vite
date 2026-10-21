@@ -5,6 +5,7 @@ import { User, Users, Nut } from "lucide-react";
 import { Container } from "react-bootstrap";
 import ProjectNav from "./ui/ProjectNav";
 import LoadingSpinner from "./ui/LoadingSpinner";
+import NotFound from "../pages/NotFound";
 import { motion, useScroll, useSpring } from "framer-motion";
 import Zoom from "react-medium-image-zoom";
 import "react-medium-image-zoom/dist/styles.css";
@@ -47,6 +48,7 @@ type CaseStudyFields = {
   subtitle?: string;
   slug?: string;
   hasNda?: boolean;
+  comingSoon?: boolean;
   organization?: string;
   overview?: Document | null;
   overviewTitle?: string;
@@ -172,7 +174,7 @@ const CaseStudyDetail: React.FC = () => {
 
         const item = res?.items?.[0] as CaseStudyEntry | undefined;
 
-        if (!item) {
+        if (!item || item.fields?.comingSoon === true) {
           setError("Case study not found");
           setCaseStudy(null);
         } else {
@@ -240,6 +242,8 @@ const CaseStudyDetail: React.FC = () => {
       </div>
     );
   }
+
+  if (error === "Case study not found") return <NotFound />;
 
   if (error) {
     return (
