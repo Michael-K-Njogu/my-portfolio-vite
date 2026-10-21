@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ContentfulLivePreview } from "@contentful/live-preview";
@@ -9,6 +10,7 @@ export type CaseStudyCardItem = {
   subtitle: string;
   year?: number | string;
   workInProgress?: boolean;
+  comingSoon?: boolean;
   imageUrl?: string;
   imageAlt: string;
   skills: string[];
@@ -22,6 +24,23 @@ const livePreviewProps = (entryId: string, fieldId: string) =>
   typeof ContentfulLivePreview?.getProps === "function"
     ? ContentfulLivePreview.getProps({ entryId, fieldId })
     : {};
+
+const CardWrapper = ({
+  item,
+  children,
+}: {
+  item: CaseStudyCardItem;
+  children: ReactNode;
+}) =>
+  item.comingSoon ? (
+    <div className="case-card case-card-disabled" aria-disabled="true">
+      {children}
+    </div>
+  ) : (
+    <Link to={`/case-studies/${item.slug}`} className="case-card">
+      {children}
+    </Link>
+  );
 
 const CaseStudyGrid = ({ items }: Props) => (
   <div className="case-grid">
@@ -37,7 +56,7 @@ const CaseStudyGrid = ({ items }: Props) => (
         }}
         viewport={{ once: true }}
       >
-        <Link to={`/case-studies/${item.slug}`} className="case-card">
+        <CardWrapper item={item}>
           <div className="case-card-media">
             {item.imageUrl ? (
               <img
@@ -51,7 +70,7 @@ const CaseStudyGrid = ({ items }: Props) => (
           </div>
 
           <div className="case-card-body">
-            {(item.year || item.workInProgress) && (
+            {(item.year || item.workInProgress || item.comingSoon) && (
               <div className="project-meta">
                 {item.year && (
                   <span
@@ -61,8 +80,14 @@ const CaseStudyGrid = ({ items }: Props) => (
                     {item.year}
                   </span>
                 )}
-                {item.workInProgress && (
-                  <span className="wip-badge">Work in progress</span>
+                {item.comingSoon ? (
+                  <span className="wip-badge coming-soon-badge">
+                    Coming soon
+                  </span>
+                ) : (
+                  item.workInProgress && (
+                    <span className="wip-badge">Work in progress</span>
+                  )
                 )}
               </div>
             )}
@@ -83,7 +108,7 @@ const CaseStudyGrid = ({ items }: Props) => (
               </ul>
             )}
           </div>
-        </Link>
+        </CardWrapper>
       </motion.div>
     ))}
   </div>
