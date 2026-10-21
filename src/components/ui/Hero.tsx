@@ -1,22 +1,22 @@
-import { useState } from "react"
-import { Container, Row, Col, Button } from 'react-bootstrap'
-import { Link } from "react-router-dom"
-import { motion } from "motion/react"
-import { ArrowDown, Person } from 'react-bootstrap-icons'
-import Avatar from './../../images/michael-njogu.jpg'
-import AnimeAvatar from '../../images/michael-anime.jpg'
+import { useState } from "react";
+import { Container, Row, Col, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { motion } from "motion/react";
+import { ArrowDown, Person } from "react-bootstrap-icons";
+import Avatar from "./../../images/michael-njogu.jpg";
+import AnimeAvatar from "../../images/michael-anime.jpg";
 
 const Hero = () => {
-  const [isFlipped, setIsFlipped] = useState(false)
+  const [isFlipped, setIsFlipped] = useState(false);
 
   // Smooth scroll to #my-work section
   const scrollToWork = (e) => {
-    e.preventDefault()
-    const section = document.querySelector("#my-work")
+    e.preventDefault();
+    const section = document.querySelector("#my-work");
     if (section) {
-      section.scrollIntoView({ behavior: "smooth" })
+      section.scrollIntoView({ behavior: "smooth" });
     }
-  }
+  };
 
   return (
     <section className="hero">
@@ -29,20 +29,30 @@ const Hero = () => {
               transition={{ duration: 0.9, ease: [0.4, 0, 0.2, 1], delay: 0.3 }}
               className="hero-text"
             >
-              <h1 className="hero-title">I turn complex problems into clear, practical solutions.</h1>
+              <h1 className="hero-title">
+                I design the experience. I build the product.
+              </h1>
               <p className="mb-4">
-                Working at the intersection of product, delivery, and UX to bring structure, alignment, and execution to complex systems.
+                I design the experience. I build the product.
               </p>
 
               <div className="hero-buttons">
                 <Button variant="primary" onClick={scrollToWork}>
-                  View My Work
-                  <span className="bootstrap-icon"><ArrowDown size={24} /></span>
+                  Explore Selected Work
+                  <span className="bootstrap-icon">
+                    <ArrowDown size={24} />
+                  </span>
                 </Button>
 
-                <Button as={Link as any} to="/about" variant="outline-secondary">
+                <Button
+                  as={Link as any}
+                  to="/about"
+                  variant="outline-secondary"
+                >
                   More About Me
-                  <span className="bootstrap-icon ms-1"><Person size={24} /></span>
+                  <span className="bootstrap-icon ms-1">
+                    <Person size={24} />
+                  </span>
                 </Button>
               </div>
             </motion.div>
@@ -76,7 +86,7 @@ const Hero = () => {
                     backfaceVisibility: "hidden",
                     position: "absolute",
                     top: 0,
-                    left: 0 
+                    left: 0,
                   }}
                 />
               </motion.div>
@@ -87,7 +97,7 @@ const Hero = () => {
         <div className="divider"></div>
       </Container>
     </section>
-  )
-}
+  );
+};
 
-export default Hero
+export default Hero;
