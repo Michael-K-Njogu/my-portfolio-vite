@@ -39,6 +39,7 @@ type CaseStudyFields = {
   isFeatured?: boolean;
   year?: number | string;
   workInProgress?: boolean;
+  comingSoon?: boolean;
   featuredImage?: { fields?: ContentfulAssetFields };
   skills?: string[] | Array<{ sys?: ContentfulSys; fields?: any }>;
   [k: string]: any;
@@ -174,6 +175,7 @@ const CaseStudies: React.FC = () => {
       subtitle: fields.subtitle ?? "",
       year: fields.year,
       workInProgress: fields.workInProgress === true,
+      comingSoon: fields.comingSoon === true,
       imageUrl: renderImageUrl(fields.featuredImage),
       imageAlt: fields.featuredImage?.fields?.title ?? "Project thumbnail",
       skills: resolveSkills(fields.skills),
@@ -210,12 +212,12 @@ const CaseStudies: React.FC = () => {
               className={`project-tab ${filter === "other" ? "active" : ""}`}
               aria-selected={filter === "other"}
             >
-              Notable Mentions
+              Honourable Mentions
             </button>
           </div>
 
           <h2 className="section-title mb-3">
-            {filter === "featured" ? "Featured Work" : "Notable Mentions"}
+            {filter === "featured" ? "Featured Work" : "Honourable Mentions"}
           </h2>
 
           <p className="mb-4 mb-md-5">
