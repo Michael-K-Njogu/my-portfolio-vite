@@ -496,7 +496,7 @@ const About: React.FC = () => {
                       )}
                     </div>
                     <div className="skill-info">
-                      <h5>{tool.name}</h5>
+                      <h4>{tool.name}</h4>
                       <span>{tool.desc}</span>
                     </div>
                   </motion.li>
@@ -578,7 +578,7 @@ const About: React.FC = () => {
                       <span className="card-date">
                         {!inProgress ? dateAttained : "Ongoing"}
                       </span>
-                      <h5>{title}</h5>
+                      <h3>{title}</h3>
                       <p>{source}</p>
                       {link ? (
                         <a
