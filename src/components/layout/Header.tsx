@@ -176,6 +176,20 @@ const Header: React.FC = () => {
                     About Me
                   </NavLink>
                 </Nav.Item>
+                <Nav.Item as="li">
+                  <NavLink
+                    to="/contact"
+                    className={({ isActive }: { isActive: boolean }) =>
+                      `nav-link transition-colors duration-300 ${
+                        isActive
+                          ? "text-white border-b-2 border-white"
+                          : "text-gray-300 hover:text-white"
+                      }`
+                    }
+                  >
+                    Let's Talk!
+                  </NavLink>
+                </Nav.Item>                
               </Nav>
             </Navbar.Collapse>
           </Container>
