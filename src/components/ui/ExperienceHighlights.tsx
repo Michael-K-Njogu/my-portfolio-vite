@@ -1,11 +1,6 @@
 import { Container } from "react-bootstrap";
 import { motion, Variants } from "framer-motion";
-import {
-  CalendarCheck,
-  VectorPen,
-  CodeSlash,
-  Magic,
-} from "react-bootstrap-icons";
+import { CalendarCheck, PenTool, CodeXml, WandSparkles } from "lucide-react";
 
 const highlights = [
   {
@@ -16,17 +11,17 @@ const highlights = [
   {
     value: "UX + UI",
     label: "Research through interaction",
-    Icon: VectorPen,
+    Icon: PenTool,
   },
   {
     value: "Design → Code",
     label: "Systems into interfaces",
-    Icon: CodeSlash,
+    Icon: CodeXml,
   },
   {
     value: "AI Assisted",
     label: "More effective workflows",
-    Icon: Magic,
+    Icon: WandSparkles,
   },
 ];
 
