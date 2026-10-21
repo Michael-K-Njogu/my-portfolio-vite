@@ -9,7 +9,7 @@ import CaseStudyGrid from "./ui/CaseStudyGrid";
 import LoadingSpinner from "./ui/LoadingSpinner";
 import { selectClient } from "../contentfulClient";
 import { ContentfulLivePreview } from "@contentful/live-preview";
-import { Stars } from "react-bootstrap-icons";
+import { Sparkles } from "lucide-react";
 
 /* ----------------------
    Types
@@ -197,7 +197,7 @@ const CaseStudies: React.FC = () => {
               className={`project-tab ${filter === "featured" ? "active" : ""}`}
               aria-selected={filter === "featured"}
             >
-              <Stars size={18} aria-hidden />
+              <Sparkles size={18} aria-hidden />
               Featured Work
             </button>
 
