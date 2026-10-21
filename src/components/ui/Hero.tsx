@@ -1,14 +1,10 @@
-import { useState } from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { ArrowDown, Person } from "react-bootstrap-icons";
-import Avatar from "./../../images/michael-njogu.jpg";
-import AnimeAvatar from "../../images/michael-anime.jpg";
+import Avatar from "./../../images/michael-njogu-profile.jpeg";
 
 const Hero = () => {
-  const [isFlipped, setIsFlipped] = useState(false);
-
   // Smooth scroll to #my-work section
   const scrollToWork = (e) => {
     e.preventDefault();
@@ -29,11 +25,17 @@ const Hero = () => {
               transition={{ duration: 0.9, ease: [0.4, 0, 0.2, 1], delay: 0.3 }}
               className="hero-text"
             >
+              <span className="hero-status">
+                <span className="status-dot" aria-hidden="true"></span>
+                OPEN TO PRODUCT DESIGN / UX ENGINEERING
+              </span>
               <h1 className="hero-title">
                 I design the experience. I build the product.
               </h1>
               <p className="mb-4">
-                I design the experience. I build the product.
+                I’m Michael Njogu, a Product Design Engineer bridging UX, design
+                systems and frontend development to turn complex problems into
+                usable digital products.
               </p>
 
               <div className="hero-buttons">
@@ -59,37 +61,13 @@ const Hero = () => {
           </Col>
 
           <Col md={3}>
-            {/* Avatar flip effect container */}
-            <div
-              className="avatar-flip-container"
-              onClick={() => setIsFlipped(!isFlipped)}
-            >
-              <motion.div
-                className="avatar-flip-inner"
-                animate={{ rotateY: isFlipped ? 180 : 0 }}
-                transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
-              >
-                <motion.img
-                  src={Avatar}
-                  alt="Michael Njogu"
-                  className="avatar-front hero-image"
-                  fetchPriority="high"
-                  style={{ backfaceVisibility: "hidden" }}
-                />
-                <motion.img
-                  src={AnimeAvatar}
-                  alt="Anime Michael"
-                  className="avatar-back hero-image"
-                  fetchPriority="high"
-                  style={{
-                    transform: "rotateY(180deg)",
-                    backfaceVisibility: "hidden",
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                  }}
-                />
-              </motion.div>
+            <div className="hero-avatar-container">
+              <img
+                src={Avatar}
+                alt="Michael Njogu"
+                className="hero-image"
+                fetchPriority="high"
+              />
             </div>
           </Col>
         </Row>
