@@ -559,6 +559,20 @@ blockquote p, blockquote p b {
     box-shadow: 0 10px 24px rgba(var(--shadow-primary), 0.18);
 }
 
+.case-card-disabled,
+.case-card-disabled:hover {
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.55;
+    filter: grayscale(1);
+    box-shadow: 0 4px 12px rgba(var(--shadow-primary), 0.1);
+}
+
+.coming-soon-badge {
+    background-color: rgba(128, 128, 128, 0.25);
+    border-color: rgba(128, 128, 128, 0.6);
+}
+
 .case-card:focus-visible {
     outline: 2px solid var(--colour-accent-primary);
     outline-offset: 3px;
@@ -1004,8 +1018,10 @@ figcaption {
 }
 
 .tool-list ul {
-    column-count: 3;
+    display: flex;
+    flex-wrap: wrap;
     font-size: 1rem;
+    justify-content: space-between;
     gap: 24px;
     list-style: none;
     margin: 0;
@@ -1014,10 +1030,10 @@ figcaption {
 
 .tool-list ul li {
     align-items: center;
+    flex: 1 1 calc(33.333% - 24px);
     border: 1px solid var(--colour-border);
     border-radius: 10px;
     display: flex;
-    margin-bottom: 24px;
     padding: 20px;
 }
 
@@ -1026,6 +1042,7 @@ figcaption {
 }
 
 .tool-list ul li h4 {
+    font-size: 1rem;
     margin-bottom: 3px;
 }
 
@@ -1076,7 +1093,7 @@ figcaption {
 }
 
 .timeline-item h3 {
-    font-size: 1.25rem;
+    font-size: 1rem;
 }
 
 .timeline-item time {
@@ -1148,6 +1165,7 @@ figcaption {
 }
 
 .learning-card-text h3 {
+    font-size: 1rem;
     margin-bottom: 3px;
 }
 
