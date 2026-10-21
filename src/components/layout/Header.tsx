@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Navbar, Container, Nav } from "react-bootstrap";
 import { NavLink, useLocation } from "react-router-dom";
-import { HashLink } from 'react-router-hash-link';
+import { HashLink } from "react-router-hash-link";
 import { Sun, Moon, Menu } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -142,7 +142,10 @@ const Header: React.FC = () => {
               </motion.button>
 
               {/* Navbar toggle for mobile */}
-              <Navbar.Toggle aria-controls="basic-navbar-nav" className="border-0">
+              <Navbar.Toggle
+                aria-controls="basic-navbar-nav"
+                className="border-0"
+              >
                 <Menu size={28} />
               </Navbar.Toggle>
             </div>
@@ -155,7 +158,7 @@ const Header: React.FC = () => {
                     smooth
                     to="/#my-work"
                     className={`nav-link transition-colors duration-300 text-gray-300 hover:text-white ${
-                      isOnAllCaseStudies ? 'active' : ''
+                      isOnAllCaseStudies ? "active" : ""
                     }`}
                   >
                     My Work
@@ -176,20 +179,6 @@ const Header: React.FC = () => {
                     About Me
                   </NavLink>
                 </Nav.Item>
-                <Nav.Item as="li">
-                  <NavLink
-                    to="/contact"
-                    className={({ isActive }: { isActive: boolean }) =>
-                      `nav-link transition-colors duration-300 ${
-                        isActive
-                          ? "text-white border-b-2 border-white"
-                          : "text-gray-300 hover:text-white"
-                      }`
-                    }
-                  >
-                    Let's Talk!
-                  </NavLink>
-                </Nav.Item>                
               </Nav>
             </Navbar.Collapse>
           </Container>
