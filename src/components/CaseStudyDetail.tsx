@@ -1,7 +1,7 @@
 // src/pages/CaseStudyDetail.tsx
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Person, People, Nut } from 'react-bootstrap-icons';
+import { User, Users, Nut } from 'lucide-react';
 import { Container } from 'react-bootstrap';
 import ProjectNav from './ui/ProjectNav';
 import LoadingSpinner from './ui/LoadingSpinner';
@@ -544,7 +544,7 @@ const CaseStudyDetail: React.FC = () => {
               <div className="project-overview-card">
                 <h5>
                   <span className="bootstrap-icon">
-                    <Person size={24} />
+                    <User size={24} />
                   </span>{' '}
                   My Role
                 </h5>
@@ -560,7 +560,7 @@ const CaseStudyDetail: React.FC = () => {
               <div className="project-overview-card">
                 <h5>
                   <span className="bootstrap-icon">
-                    <People size={24} />
+                    <Users size={24} />
                   </span>{' '}
                   Team Composition
                 </h5>
