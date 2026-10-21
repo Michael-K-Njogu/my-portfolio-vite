@@ -1,7 +1,7 @@
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
-import { ArrowDown, Person } from "react-bootstrap-icons";
+import { ArrowDown, ArrowUpRight } from "react-bootstrap-icons";
 import Avatar from "./../../images/michael-njogu-profile.jpeg";
 
 const Hero = () => {
@@ -30,7 +30,7 @@ const Hero = () => {
                 OPEN TO PRODUCT DESIGN / UX ENGINEERING
               </span>
               <h1 className="hero-title">
-                I design the experience. I build the product.
+                Designing the experience. Building the product.
               </h1>
               <p className="mb-4">
                 I’m Michael Njogu, a Product Design Engineer bridging UX, design
@@ -42,7 +42,7 @@ const Hero = () => {
                 <Button variant="primary" onClick={scrollToWork}>
                   Explore Selected Work
                   <span className="bootstrap-icon">
-                    <ArrowDown size={24} />
+                    <ArrowDown size={20} />
                   </span>
                 </Button>
 
@@ -51,9 +51,9 @@ const Hero = () => {
                   to="/about"
                   variant="outline-secondary"
                 >
-                  More About Me
+                  A Little About Me
                   <span className="bootstrap-icon ms-1">
-                    <Person size={24} />
+                    <ArrowUpRight size={20} />
                   </span>
                 </Button>
               </div>
