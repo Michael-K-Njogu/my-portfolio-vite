@@ -2,6 +2,7 @@ import { Container, Row, Col, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { ArrowDown, ArrowUpRight } from "lucide-react";
+import AvatarBadge from "./../../images/open-to-design-code.png";
 import Avatar from "./../../images/michael-njogu-profile.jpeg";
 
 const Hero = () => {
@@ -62,12 +63,19 @@ const Hero = () => {
 
           <Col md={3}>
             <div className="hero-avatar-container">
-              <img
-                src={Avatar}
-                alt="Michael Njogu"
-                className="hero-image"
-                fetchPriority="high"
-              />
+              <div className="hero-avatar">
+                <img
+                  src={Avatar}
+                  alt="Michael Njogu"
+                  className="hero-image"
+                  fetchPriority="high"
+                />
+                <img
+                  src={AvatarBadge}
+                  alt="Open to Design / Code"
+                  className="hero-avatar-badge"
+                />
+              </div>
             </div>
           </Col>
         </Row>
