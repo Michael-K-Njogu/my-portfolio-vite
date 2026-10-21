@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
-import { ExclamationDiamond } from 'react-bootstrap-icons';
+import { OctagonAlert } from 'lucide-react';
 
 const NotFound: React.FC = () => {
   useEffect(() => {
@@ -18,7 +18,7 @@ const NotFound: React.FC = () => {
       <section className="hero" aria-labelledby="notfound-title">
         <Container>
           <div className="icon-wrapper mb-4" aria-hidden>
-            <ExclamationDiamond size={64} />
+            <OctagonAlert size={64} />
           </div>
 
           <h1 id="notfound-title" className="mb-4">
