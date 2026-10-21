@@ -1,7 +1,6 @@
 // src/components/layout/Footer.tsx
 import React from "react";
 import { Row, Col, Container } from "react-bootstrap";
-import { Linkedin, EnvelopeAt, Github } from "react-bootstrap-icons";
 
 const currentYear: number = new Date().getFullYear();
 
@@ -12,30 +11,10 @@ const Footer: React.FC = () => {
         <Row>
           <Col md={8}>
             <p>
-              &copy; {currentYear} Michael Njogu. Powered by{" "}
-              <a
-                href="https://www.typescriptlang.org/"
-                rel="nofollow noreferrer"
-                target="_blank"
-              >
-                TypeScript
-              </a>{", "}              
-              <a
-                href="https://www.contentful.com/"
-                rel="nofollow noreferrer"
-                target="_blank"
-              >
-                Contentful APIs
-              </a>{" "}
-              &amp;{" "}
-              <a
-                href="https://vite.dev/guide/"
-                rel="nofollow noreferrer"
-                target="_blank"
-              >
-                React + Vite
+              &copy; {currentYear} Michael Njogu. &nbsp;
+              <a href="#" rel="nofollow noreferrer">
+                About this portfolio
               </a>
-              .
             </p>
           </Col>
 
@@ -48,7 +27,7 @@ const Footer: React.FC = () => {
                   target="_blank"
                   title="Connect with me on LinkedIn"
                 >
-                  <Linkedin size={24} />
+                  LinkedIn
                 </a>
               </li>
 
@@ -58,8 +37,8 @@ const Footer: React.FC = () => {
                   onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
                     e.preventDefault();
                     const codes = [
-                      109, 121, 107, 101, 107, 117, 110, 121, 111, 64, 103, 109, 97,
-                      105, 108, 46, 99, 111, 109,
+                      109, 121, 107, 101, 107, 117, 110, 121, 111, 64, 103, 109,
+                      97, 105, 108, 46, 99, 111, 109,
                     ];
                     const email = String.fromCharCode(...codes);
                     window.location.href = `mailto:${email}`;
@@ -67,7 +46,7 @@ const Footer: React.FC = () => {
                   title="Send me an email"
                   aria-label="Send me an email"
                 >
-                  <EnvelopeAt size={24} />
+                  Email
                 </a>
               </li>
 
@@ -78,7 +57,7 @@ const Footer: React.FC = () => {
                   target="_blank"
                   title="View my GitHub profile"
                 >
-                  <Github size={24} />
+                  GitHub
                 </a>
               </li>
             </ul>
