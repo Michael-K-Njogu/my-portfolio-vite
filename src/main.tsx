@@ -52,6 +52,11 @@ if (!root) {
   );
 }
 
+// Log accessibility violations to the console in development only
+if (import.meta.env.DEV) {
+  import("./utils/axe").then(({ initAxe }) => initAxe());
+}
+
 ReactDOM.createRoot(root).render(
   <React.StrictMode>
     <ContentfulLivePreviewProvider
