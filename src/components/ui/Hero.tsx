@@ -1,7 +1,7 @@
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { motion } from "motion/react";
-import { ArrowDown, ArrowUpRight } from "react-bootstrap-icons";
+import { ArrowDown, ArrowUpRight } from "lucide-react";
 import Avatar from "./../../images/michael-njogu-profile.jpeg";
 
 const Hero = () => {
