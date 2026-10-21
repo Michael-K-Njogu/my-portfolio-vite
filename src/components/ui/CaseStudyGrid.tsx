@@ -8,6 +8,7 @@ export type CaseStudyCardItem = {
   title: string;
   subtitle: string;
   year?: number | string;
+  workInProgress?: boolean;
   imageUrl?: string;
   imageAlt: string;
   skills: string[];
@@ -50,13 +51,20 @@ const CaseStudyGrid = ({ items }: Props) => (
           </div>
 
           <div className="case-card-body">
-            {item.year && (
-              <span
-                className="project-year"
-                {...(livePreviewProps(item.id, "year") as any)}
-              >
-                {item.year}
-              </span>
+            {(item.year || item.workInProgress) && (
+              <div className="project-meta">
+                {item.year && (
+                  <span
+                    className="project-year"
+                    {...(livePreviewProps(item.id, "year") as any)}
+                  >
+                    {item.year}
+                  </span>
+                )}
+                {item.workInProgress && (
+                  <span className="wip-badge">Work in progress</span>
+                )}
+              </div>
             )}
             <h3 {...(livePreviewProps(item.id, "title") as any)}>
               {item.title}
