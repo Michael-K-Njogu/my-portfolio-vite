@@ -19,7 +19,7 @@ const Hero = () => {
     <section className="hero">
       <Container>
         <Row className="align-items-center">
-          <Col md={9}>
+          <Col md={12} lg={9}>
             <motion.div
               initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -61,7 +61,7 @@ const Hero = () => {
             </motion.div>
           </Col>
 
-          <Col md={3}>
+          <Col md={12} lg={3}>
             <div className="hero-avatar-container">
               <div className="hero-avatar">
                 <img
