@@ -2,8 +2,8 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { Navbar, Container, Nav } from "react-bootstrap";
 import { NavLink, useLocation } from "react-router-dom";
-import { HashLink } from 'react-router-hash-link';
-import { Sun, Moon, List } from "react-bootstrap-icons";
+import { HashLink } from "react-router-hash-link";
+import { Sun, Moon, Menu } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 /* Animation variants */
@@ -142,8 +142,11 @@ const Header: React.FC = () => {
               </motion.button>
 
               {/* Navbar toggle for mobile */}
-              <Navbar.Toggle aria-controls="basic-navbar-nav" className="border-0">
-                <List size={28} />
+              <Navbar.Toggle
+                aria-controls="basic-navbar-nav"
+                className="border-0"
+              >
+                <Menu size={28} />
               </Navbar.Toggle>
             </div>
 
@@ -155,7 +158,7 @@ const Header: React.FC = () => {
                     smooth
                     to="/#my-work"
                     className={`nav-link transition-colors duration-300 text-gray-300 hover:text-white ${
-                      isOnAllCaseStudies ? 'active' : ''
+                      isOnAllCaseStudies ? "active" : ""
                     }`}
                   >
                     My Work

@@ -1,7 +1,7 @@
 // src/components/ui/BackToTop.tsx
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUp } from "react-bootstrap-icons";
+import { ArrowUp } from "lucide-react";
 
 const BackToTop: React.FC = () => {
   const [isVisible, setIsVisible] = useState<boolean>(false);

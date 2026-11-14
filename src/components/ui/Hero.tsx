@@ -1,34 +1,35 @@
-import { useState } from "react"
-import { Container, Row, Col, Button } from 'react-bootstrap'
-import { Link } from "react-router-dom"
-import { motion } from "motion/react"
-import { ArrowDown, Person } from 'react-bootstrap-icons'
-import Avatar from './../../images/michael-njogu.jpg'
-import AnimeAvatar from '../../images/michael-anime.jpg'
+import { Container, Row, Col, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import { motion } from "motion/react";
+import { ArrowDown, ArrowUpRight } from "lucide-react";
+import AvatarBadge from "./../../images/open-to-design-code.png";
+import Avatar from "./../../images/michael-njogu-profile.jpeg";
 
 const Hero = () => {
-  const [isFlipped, setIsFlipped] = useState(false)
-
   // Smooth scroll to #my-work section
   const scrollToWork = (e) => {
-    e.preventDefault()
-    const section = document.querySelector("#my-work")
+    e.preventDefault();
+    const section = document.querySelector("#my-work");
     if (section) {
-      section.scrollIntoView({ behavior: "smooth" })
+      section.scrollIntoView({ behavior: "smooth" });
     }
-  }
+  };
 
   return (
     <section className="hero">
       <Container>
         <Row className="align-items-center">
-          <Col md={9}>
+          <Col md={12} lg={9}>
             <motion.div
               initial={{ opacity: 0, y: 30, filter: "blur(8px)" }}
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               transition={{ duration: 0.9, ease: [0.4, 0, 0.2, 1], delay: 0.3 }}
               className="hero-text"
             >
+              <span className="hero-status">
+                <span className="status-dot" aria-hidden="true"></span>
+                OPEN TO PRODUCT DESIGN / UX ENGINEERING
+              </span>
               <h1 className="hero-title">I design the experience. I build the product.</h1>
               <p className="mb-4">
                 I'm a Product Design Engineer bridging UX, design systems, and frontend development to turn complex problems into usable digital products.
@@ -36,50 +37,41 @@ const Hero = () => {
 
               <div className="hero-buttons">
                 <Button variant="primary" onClick={scrollToWork}>
-                  View My Work
-                  <span className="bootstrap-icon"><ArrowDown size={24} /></span>
+                  Explore Selected Work
+                  <span className="bootstrap-icon">
+                    <ArrowDown size={20} />
+                  </span>
                 </Button>
 
-                <Button as={Link as any} to="/about" variant="outline-secondary">
-                  More About Me
-                  <span className="bootstrap-icon ms-1"><Person size={24} /></span>
+                <Button
+                  as={Link as any}
+                  to="/about"
+                  variant="outline-secondary"
+                >
+                  A Little About Me
+                  <span className="bootstrap-icon ms-1">
+                    <ArrowUpRight size={20} />
+                  </span>
                 </Button>
               </div>
             </motion.div>
           </Col>
 
-          <Col md={3}>
-            {/* Avatar flip effect container */}
-            <div
-              className="avatar-flip-container"
-              onClick={() => setIsFlipped(!isFlipped)}
-            >
-              <motion.div
-                className="avatar-flip-inner"
-                animate={{ rotateY: isFlipped ? 180 : 0 }}
-                transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
-              >
-                <motion.img
+          <Col md={12} lg={3}>
+            <div className="hero-avatar-container">
+              <div className="hero-avatar">
+                <img
                   src={Avatar}
                   alt="Michael Njogu"
-                  className="avatar-front hero-image"
+                  className="hero-image"
                   fetchPriority="high"
-                  style={{ backfaceVisibility: "hidden" }}
                 />
-                <motion.img
-                  src={AnimeAvatar}
-                  alt="Anime Michael"
-                  className="avatar-back hero-image"
-                  fetchPriority="high"
-                  style={{
-                    transform: "rotateY(180deg)",
-                    backfaceVisibility: "hidden",
-                    position: "absolute",
-                    top: 0,
-                    left: 0 
-                  }}
+                <img
+                  src={AvatarBadge}
+                  alt="Open to Design / Code"
+                  className="hero-avatar-badge"
                 />
-              </motion.div>
+              </div>
             </div>
           </Col>
         </Row>
@@ -87,7 +79,7 @@ const Hero = () => {
         <div className="divider"></div>
       </Container>
     </section>
-  )
-}
+  );
+};
 
-export default Hero
+export default Hero;

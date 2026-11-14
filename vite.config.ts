@@ -124,7 +124,7 @@ export default defineConfig(({ mode }) => {
               if (id.includes('react-router-dom')) return 'vendor-router';
               if (id.includes('react-bootstrap')) return 'vendor-bootstrap';
               if (id.includes('react-medium-image-zoom')) return 'vendor-zoom';
-              if (id.includes('react-bootstrap-icons') || id.includes('bootstrap-icons')) return 'vendor-icons';
+              if (id.includes('lucide-react')) return 'vendor-icons';
               return 'vendor';
             }
           },

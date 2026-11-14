@@ -1,6 +1,7 @@
 // src/App.tsx
 import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import BackToTop from "./components/ui/BackToTop";
@@ -55,9 +56,12 @@ const App: React.FC = () => {
     <>
       <Header />
       <ScrollToTop />
-      <Outlet /> {/* ← Nested routes render here */}
+      <main id="main-content">
+        <Outlet /> {/* ← Nested routes render here */}
+      </main>
       <BackToTop />
       <Footer />
+      <Analytics />
     </>
   );
 };

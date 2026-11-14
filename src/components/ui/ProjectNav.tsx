@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Container } from 'react-bootstrap';
-import { ArrowLeft } from 'react-bootstrap-icons';
+import { ArrowLeft } from 'lucide-react';
 import { HashLink } from 'react-router-hash-link';
 
 type ProjectNavProps = {

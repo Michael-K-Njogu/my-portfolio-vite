@@ -1,41 +1,28 @@
 // src/components/layout/Footer.tsx
-import React from "react";
+import React, { useState } from "react";
 import { Row, Col, Container } from "react-bootstrap";
-import { Linkedin, EnvelopeAt, Github } from "react-bootstrap-icons";
+import AboutPortfolioModal from "../ui/AboutPortfolioModal";
 
 const currentYear: number = new Date().getFullYear();
 
 const Footer: React.FC = () => {
+  const [showAbout, setShowAbout] = useState(false);
+
   return (
     <footer>
       <Container>
         <Row>
           <Col md={8}>
             <p>
-              &copy; {currentYear} Michael Njogu. Powered by{" "}
-              <a
-                href="https://www.typescriptlang.org/"
-                rel="nofollow noreferrer"
-                target="_blank"
+              &copy; {currentYear} Michael Njogu. &nbsp;
+              <button
+                type="button"
+                className="footer-link-button"
+                onClick={() => setShowAbout(true)}
+                aria-haspopup="dialog"
               >
-                TypeScript
-              </a>{", "}              
-              <a
-                href="https://www.contentful.com/"
-                rel="nofollow noreferrer"
-                target="_blank"
-              >
-                Contentful APIs
-              </a>{" "}
-              &amp;{" "}
-              <a
-                href="https://vite.dev/guide/"
-                rel="nofollow noreferrer"
-                target="_blank"
-              >
-                React + Vite
-              </a>
-              .
+                About this portfolio
+              </button>
             </p>
           </Col>
 
@@ -48,26 +35,7 @@ const Footer: React.FC = () => {
                   target="_blank"
                   title="Connect with me on LinkedIn"
                 >
-                  <Linkedin size={24} />
-                </a>
-              </li>
-
-              <li>
-                <a
-                  href="#email"
-                  onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
-                    e.preventDefault();
-                    const codes = [
-                      109, 121, 107, 101, 107, 117, 110, 121, 111, 64, 103, 109, 97,
-                      105, 108, 46, 99, 111, 109,
-                    ];
-                    const email = String.fromCharCode(...codes);
-                    window.location.href = `mailto:${email}`;
-                  }}
-                  title="Send me an email"
-                  aria-label="Send me an email"
-                >
-                  <EnvelopeAt size={24} />
+                  LinkedIn
                 </a>
               </li>
 
@@ -78,13 +46,18 @@ const Footer: React.FC = () => {
                   target="_blank"
                   title="View my GitHub profile"
                 >
-                  <Github size={24} />
+                  GitHub
                 </a>
               </li>
             </ul>
           </Col>
         </Row>
       </Container>
+
+      <AboutPortfolioModal
+        show={showAbout}
+        onHide={() => setShowAbout(false)}
+      />
     </footer>
   );
 };
