@@ -30,13 +30,9 @@ const Hero = () => {
                 <span className="status-dot" aria-hidden="true"></span>
                 OPEN TO PRODUCT DESIGN / UX ENGINEERING
               </span>
-              <h1 className="hero-title">
-                Designing the experience. Building the product.
-              </h1>
+              <h1 className="hero-title">I design the experience. I build the product.</h1>
               <p className="mb-4">
-                I’m Michael Njogu, a Product Design Engineer bridging UX, design
-                systems and frontend development to turn complex problems into
-                usable digital products.
+                I'm a Product Design Engineer bridging UX, design systems, and frontend development to turn complex problems into usable digital products.
               </p>
 
               <div className="hero-buttons">
