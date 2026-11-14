@@ -14,6 +14,7 @@
     "@contentful/rich-text-react-renderer": "^16.1.6",
     "@fontsource-variable/ibm-plex-sans": "^5.2.8",
     "@fontsource/libre-caslon-text": "^5.2.7",
+    "@vercel/analytics": "^2.0.1",
     "bootstrap": "^5.3.8",
     "contentful": "^11.9.0",
     "framer-motion": "^12.23.24",
