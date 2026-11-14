@@ -1,6 +1,7 @@
 // src/App.tsx
 import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import BackToTop from "./components/ui/BackToTop";
@@ -60,6 +61,7 @@ const App: React.FC = () => {
       </main>
       <BackToTop />
       <Footer />
+      <Analytics />
     </>
   );
 };
