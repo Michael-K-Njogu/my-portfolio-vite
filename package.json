@@ -15,6 +15,7 @@
     "@fontsource-variable/ibm-plex-sans": "^5.2.8",
     "@fontsource/libre-caslon-text": "^5.2.7",
     "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.1.0",
     "bootstrap": "^5.3.8",
     "contentful": "^11.9.0",
     "framer-motion": "^12.23.24",

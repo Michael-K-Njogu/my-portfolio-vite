@@ -2,6 +2,7 @@
 import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import BackToTop from "./components/ui/BackToTop";
@@ -15,7 +16,7 @@ const App: React.FC = () => {
       "😢 Leaving so soon?",
       "✨ The pixels await your return!",
       "🪄 Still here waiting for you...",
-      "🎨 You forgot something..."
+      "🎨 You forgot something...",
     ];
 
     // Properly type the timer handle for both browser and Node environments
@@ -25,7 +26,8 @@ const App: React.FC = () => {
       if (document.hidden) {
         // schedule a title change (kept immediate here; you can increase delay)
         timeoutId = setTimeout(() => {
-          const randomMessage = awayMessages[Math.floor(Math.random() * awayMessages.length)];
+          const randomMessage =
+            awayMessages[Math.floor(Math.random() * awayMessages.length)];
           document.title = randomMessage;
         }, 0);
       } else {
@@ -62,6 +64,7 @@ const App: React.FC = () => {
       <BackToTop />
       <Footer />
       <Analytics />
+      <SpeedInsights />
     </>
   );
 };
